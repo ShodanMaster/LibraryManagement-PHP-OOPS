@@ -37,7 +37,7 @@ if (!isset($_SESSION['user_id'])) {
                     Masters
                 </a>
                 <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="index.php?act=usermaster">User Master</a></li>
+                    <li><a class="dropdown-item" href="index.php?act=librarian">Librarian Master</a></li>
                     <li><a class="dropdown-item" href="#">Another action</a></li>
                     <li><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item" href="#">Something else here</a></li>
@@ -62,8 +62,8 @@ if (!isset($_SESSION['user_id'])) {
         case "":
                 echo "<h1>Library Management</h1>";
                 break;
-        case "usermaster": 
-            include "views/usermaster.php";
+        case "librarian": 
+            include "views/masters/librarian.php";
             break;
     }
 
