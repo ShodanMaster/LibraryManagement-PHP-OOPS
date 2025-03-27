@@ -13,6 +13,22 @@ class LibrarianController extends Librarian{
         }
     }
 
+    public function getLibrarians(){
+        $librariansJson = $this->librariansGet();
+
+        $librarians = json_decode($librariansJson, true);
+        
+        if ($librarians === null || !isset($librarians['data'])) {
+            return json_encode([
+                "status" => 500,
+                "message" => "Invalid JSON response from userLibrarians()",
+                "debug" => $librariansJson
+            ]);
+        }
+
+        return json_encode($librarians);
+    }
+
     public function createLibrarian($username, $password, $confirmPassword){
         $validation = $this->validate($username, $password, $confirmPassword);
 

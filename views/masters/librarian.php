@@ -36,12 +36,30 @@
   </div>
 </div>
 
-<div class="d-flex justify-content-between">
+<div class="d-flex justify-content-between mb-3">
     <h1>Librarian Master</h1>
 
     <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#librarianModal">
         Add Librarian
     </button>
+</div>
+
+<div class="card shadow-lg">
+  <div class="card-header bg-success text-white fs-4">
+    Librarians Table
+  </div>
+  <div class="card-body">
+    <table id="librariansTable" class="display">
+          <thead>
+              <tr>
+                  <th>ID</th>
+                  <th>username</th>
+                  <th>Action</th>
+              </tr>
+          </thead>
+          <tbody></tbody>
+      </table>
+  </div>
 </div>
 
 <script src="js/actions/librarian.js"></script>

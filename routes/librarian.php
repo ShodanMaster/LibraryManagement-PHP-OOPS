@@ -7,6 +7,18 @@ $action = $_REQUEST['action'] ??'';
 
 header('Content-Type: application/json');
 
+if ($_SERVER["REQUEST_METHOD"] == "GET") {
+    $response = $librarian->getLibrarians();
+
+    if (!json_decode($response, true)) {
+        echo json_encode(["status" => 500, "message" => "Invalid JSON response", "debug" => $response]);
+        exit;
+    }
+
+    echo $response;
+    exit;
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'] ?? '';
     $password = $_POST['password'] ?? '';
