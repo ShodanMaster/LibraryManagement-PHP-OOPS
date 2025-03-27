@@ -56,9 +56,23 @@ $(document).ready(function () {
                         confirmButtonText: "OK",
                     }).then(() => {
                         table.ajax.reload();
-                        $('#librarianModal').modal('hide');
+                        $('#addLibrarianModal').modal('hide');
                     });
-                }                
+                }else if(response.status === 403){
+                    Swal.fire({
+                        title: "Warning!",
+                        text: response.message,
+                        icon: "warning",
+                        confirmButtonText: "OK",
+                    })
+                }else{
+                    Swal.fire({
+                        title: "Error!",
+                        text: response.message,
+                        icon: "error",
+                        confirmButtonText: "OK",
+                    })
+                }             
             }
         });
     });
