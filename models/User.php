@@ -6,7 +6,7 @@ class User extends Dbconfig{
 
     protected function authenticated($username, $password){
         try {
-            $query = "SELECT id, password FROM users WHERE username = ?";
+            $query = "SELECT id, role, password FROM users WHERE username = ?";
             $stmt = $this->connect()->prepare($query);
             $stmt->bind_param("s", $username);
             $stmt->execute();

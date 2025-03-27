@@ -1,12 +1,7 @@
 <?php 
-session_start();
 
-if (!isset($_SESSION['user_id'])) {
-    header("Location: authenticate.php");
-    exit();
-}
+include_once("config/session.php");
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -72,6 +67,5 @@ if (!isset($_SESSION['user_id'])) {
 
     </div>
     <script src="bootstrap/bootstrap.bundle.min.js"></script>
-    <script src="js/actions/task.js"></script>
 </body>
 </html>

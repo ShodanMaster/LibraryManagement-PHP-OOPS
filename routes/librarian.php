@@ -1,7 +1,7 @@
 <?php
 
-require_once("../controllers/LoginController.php");
-$authenticate = new LoginController();
+require_once("../controllers/librarianController.php");
+$librarian = new librarianController();
 
 $action = $_REQUEST['action'] ??'';
 
@@ -12,13 +12,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = $_POST['password'] ?? '';
     $confirmPassword = $_POST['password_confirmation'] ?? '';
     
-    if($action == 'login'){
-        $response = $authenticate->authenticate($username, $password);
-        echo $response;
-    }
-    
-    if($action == 'signup'){
-       $response = $authenticate->register($username, $password, $confirmPassword);
+    if($action == 'add'){
+       $response = $librarian->createLibrarian($username, $password, $confirmPassword);
        echo $response;
     }
     

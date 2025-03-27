@@ -21,7 +21,7 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-group mb-3">
-                        <input type="password" class="form-control" name="confirm_password" id="confirm-password" placeholder="Confirm Password" required autocomplete="new-password">
+                        <input type="password" class="form-control" name="password_confirmation" id="confirm-password" placeholder="Confirm Password" required autocomplete="new-password">
                     </div>
                 </div>
             </div>
@@ -43,3 +43,5 @@
         Add Librarian
     </button>
 </div>
+
+<script src="js/actions/librarian.js"></script>

@@ -30,7 +30,7 @@ class LoginController extends User{
         return json_encode($registered);
     }
     
-    public function validate($username, $password, $confirmPassword = null) {
+    private function validate($username, $password, $confirmPassword = null) {
         if (empty($username) || empty($password)) {
             return ["status" => 400, "message" => "Username and Password are required!"];
         }

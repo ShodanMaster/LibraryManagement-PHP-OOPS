@@ -1,5 +1,5 @@
 <?php
-session_start();
+// session_start();
 require_once("../config/dbconfig.php");
 
 class Librarian extends Dbconfig{
