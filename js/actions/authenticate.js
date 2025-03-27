@@ -36,7 +36,7 @@ $(document).ready(function () {
         
         $.ajax({
             type: "POST",
-            url: "actions/login.php?action=login",
+            url: "routes/login.php?action=login",
             data: formData,
             contentType: false,
             processData: false,
@@ -75,7 +75,7 @@ $(document).ready(function () {
 
         $.ajax({
             type: "POST",
-            url: "actions/login.php?action=signup",
+            url: "routes/login.php?action=signup",
             data: formData,
             contentType: false,
             processData: false,
