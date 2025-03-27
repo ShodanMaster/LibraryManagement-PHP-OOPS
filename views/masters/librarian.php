@@ -1,9 +1,9 @@
 <!-- Modal -->
-<div class="modal fade" id="librarianModal" tabindex="-1" aria-labelledby="librarianModalLabel" aria-hidden="true">
+<div class="modal fade" id="addLibrarianModal" tabindex="-1" aria-labelledby="addLibrarianModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header bg-success text-white">
-        <h1 class="modal-title fs-5" id="librarianModalLabel">Modal title</h1>
+        <h1 class="modal-title fs-5" id="addLibrarianModalLabel">Modal title</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <form id="librarian-form">
@@ -39,7 +39,7 @@
 <div class="d-flex justify-content-between mb-3">
     <h1>Librarian Master</h1>
 
-    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#librarianModal">
+    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addLibrarianModal">
         Add Librarian
     </button>
 </div>

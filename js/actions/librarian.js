@@ -29,6 +29,10 @@ $(document).ready(function () {
         lengthMenu: [[5, 10, 25, -1], [5, 10, 25, "All"]]
     });
 
+    $('#addLibrarianModal').on('hidden.bs.modal', function () {
+        $(this).find('form')[0].reset();
+    });
+
     $(document).on('submit', '#librarian-form', function (e) {
 
         e.preventDefault();
@@ -51,12 +55,11 @@ $(document).ready(function () {
                         icon: "success",
                         confirmButtonText: "OK",
                     }).then(() => {
-                        // table.ajax.reload();
+                        table.ajax.reload();
                         $('#librarianModal').modal('hide');
                     });
                 }                
             }
         });
-
     });
 });
