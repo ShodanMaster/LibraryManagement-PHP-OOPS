@@ -20,19 +20,16 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = $_POST['username'] ?? '';
-    $password = $_POST['password'] ?? '';
-    $confirmPassword = $_POST['password_confirmation'] ?? '';
     
     if($action == 'add'){
-       $response = $librarian->createLibrarian($username, $password, $confirmPassword);
-       echo $response;
+        // print_r($_POST);exit;
+        $response = $librarian->createLibrarian($_POST);
+        echo $response;
     }
     
-    if($action == 'logout'){
-        session_unset();
-        session_destroy();
-        header("Location: ../athenticate.php");
-        exit();
+    if ($action == 'edit') {
+        // print_r($_POST);exit;
+        $response = $librarian->updateLibrarian($_POST);
+        echo $response;
     }
 }

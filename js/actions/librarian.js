@@ -19,7 +19,7 @@ $(document).ready(function () {
                 data: null,
                 render: function (data, type, row) {
                     return `
-                        <button class="btn btn-sm btn-info edit-btn"  data-bs-toggle="modal" data-bs-target="#editTaskModal" data-id="${row.id}" data-username="${row.username}">Edit</button>
+                        <button class="btn btn-sm btn-info edit-btn"  data-bs-toggle="modal" data-bs-target="#editLibrarianModal" data-id="${row.id}" data-username="${row.username}">Edit</button>
                         <button class="btn btn-sm btn-danger delete-btn" data-id="${row.id}">Delete</button>
                     `;
                 }
@@ -32,6 +32,14 @@ $(document).ready(function () {
     $('#addLibrarianModal').on('hidden.bs.modal', function () {
         $(this).find('form')[0].reset();
     });
+    
+    document.getElementById('show-password').addEventListener('change', function () {
+        let passwordFields = document.querySelectorAll('#password, #confirm-password');
+        passwordFields.forEach(field => {
+            field.type = this.checked ? 'text' : 'password';
+        });
+    });
+  
 
     $(document).on('submit', '#librarian-form', function (e) {
 
@@ -75,5 +83,86 @@ $(document).ready(function () {
                 }             
             }
         });
+    });
+
+        
+    document.getElementById('change-password').addEventListener('change', function () {
+        
+        let passwordFields = document.querySelectorAll('#edit-password, #edit-confirm-password, #edit-show-password');
+        passwordFields.forEach(field => {
+            field.disabled = !this.checked;
+        });
+    });
+        
+    document.getElementById('edit-show-password').addEventListener('change', function () {
+        let passwordFields = document.querySelectorAll('#edit-password, #edit-confirm-password');
+        passwordFields.forEach(field => {
+            field.type = this.checked ? 'text' : 'password';
+        });
+    });
+
+    
+
+    $('#librariansTable').on('click', '.edit-btn', function () {
+        var userId = $(this).data('id');
+        var username = $(this).data('username');
+    
+        console.log(userId, username);
+    
+        $('#edit-id').val(userId);
+        $('#edit-username').val(username);
+        $('#change-password').prop('checked', false);
+        $('#edit-show-password').prop('checked', false);
+        $('#edit-password').val('').prop('disabled', true);
+        $('#edit-confirm-password').val('').prop('disabled', true);
+    
+        $('#change-password').on('change', function () {
+            $('#edit-password, #edit-confirm-password', '#edit-show-password').prop('disabled', !this.checked);
+        });
+    });
+    
+
+    $(document).on('submit', '#librarianEdit-form', function (e) {
+        e.preventDefault();
+
+        var formData = new FormData(this);
+        formData.append('action', 'edit');
+
+        $.ajax({
+            type: "POST",
+            url: "routes/librarian.php",
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (response) {
+                console.log(response);
+                if(response.status === 200){
+                    Swal.fire({
+                        title: "Success!",
+                        text: response.message,
+                        icon: "success",
+                        confirmButtonText: "OK",
+                    }).then(() => {
+                        table.ajax.reload();
+                        $('#editLibrarianModal').modal('hide');
+                    });
+                }else if(response.status === 403){
+                    Swal.fire({
+                        title: "Warning!",
+                        text: response.message,
+                        icon: "warning",
+                        confirmButtonText: "OK",
+                    })
+                }else{
+                    Swal.fire({
+                        title: "Error!",
+                        text: response.message,
+                        icon: "error",
+                        confirmButtonText: "OK",
+                    })
+                }                  
+            }
+        });
+        
     });
 });

@@ -29,15 +29,43 @@ class LibrarianController extends Librarian{
         return json_encode($librarians);
     }
 
-    public function createLibrarian($username, $password, $confirmPassword){
+    public function createLibrarian($post){
+        // print_r($post);exit;    
+        $username = $post['username'];
+        $password = $post['password'];
+        $confirmPassword = $post['password_confirmation'];
+        
         $validation = $this->validate($username, $password, $confirmPassword);
-
+        
         if ($validation['status'] !== 200) {
             return json_encode($validation);
         }
+        // print_r($post);exit;    
 
-        $createLibrarian = $this->librarianCreate($username, $password, $confirmPassword);
+        $createLibrarian = $this->librarianCreate($username, $password);
         return json_encode($createLibrarian);
+    }
+
+    public function updateLibrarian($post){
+        // print_r($post);
+        $id = $post['id'];
+        $username = $post['username'];
+        $password = $post['password'] ?? '';
+        $confirmPassword = $post['password_confirmation'] ?? '';
+
+        if(isset($post['changePassword'])){
+            $validation = $this->validate($username, $password, $confirmPassword);
+            
+            if ($validation['status'] !== 200) {
+                return json_encode($validation);
+            }
+
+            $updateLibarrian = $this->librarianUpdate($id, $username, $password);
+            return json_encode($updateLibarrian);
+            
+        }
+        $updateLibarrian = $this->librarianUpdate($id, $username);
+        return json_encode($updateLibarrian);
     }
 
     private function validate($username, $password, $confirmPassword = null) {
