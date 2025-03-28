@@ -21,7 +21,7 @@ class LibrarianController extends Librarian{
         if ($librarians === null || !isset($librarians['data'])) {
             return json_encode([
                 "status" => 500,
-                "message" => "Invalid JSON response from userLibrarians()",
+                "message" => "Invalid JSON response from getLibrarians()",
                 "debug" => $librariansJson
             ]);
         }
