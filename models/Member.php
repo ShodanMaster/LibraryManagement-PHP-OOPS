@@ -111,46 +111,39 @@ class Member extends Dbconfig{
         
     }
 
-    protected function librarianUpdate($id, $username, $password = null) {
+    protected function memberUpdate($id, $name, $phone) {
         try {
             $conn = $this->connect();
             $conn->begin_transaction();
     
-            $query = "SELECT id FROM users WHERE id = ?";
+            $query = "SELECT id FROM members WHERE id = ?";
             $stmt = $conn->prepare($query);
             $stmt->bind_param("i", $id);
             $stmt->execute();
             $result = $stmt->get_result();
     
             if ($result->num_rows === 0) {
-                return ["status" => 404, "message" => "User Not Found"];
+                return ["status" => 404, "message" => "Member Not Found"];
             }
-    
-            if (!empty($password)) {
-                $sql = "UPDATE users SET username = ?, password = ? WHERE id = ?";
-                $stmt = $conn->prepare($sql);
-                $stmt->bind_param("ssi", $username, $password, $id);
-            } else {
-                $sql = "UPDATE users SET username = ? WHERE id = ?";
-                $stmt = $conn->prepare($sql);
-                $stmt->bind_param("si", $username, $id);
-            }
+            
+            $sql = "UPDATE members SET name = ?, phone = ? WHERE id = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("ssi", $name, $phone, $id);
     
             if ($stmt->execute()) {
                 $conn->commit();
                 return [
                     'status' => 200,
-                    'message' => !empty($password) 
-                        ? 'Username and Password Updated Successfully' 
-                        : 'Username Updated Successfully'
+                    'message' =>'Member Updated Successfully'
                 ];
             }
     
         } catch (mysqli_sql_exception $e) {
             $conn->rollback();
-            if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
-                return ["status" => 409, "message" => "Username already exists!"];
+            if (strpos($e->getMessage(), 'Duplicate entry') !== false && strpos($e->getMessage(), 'for key \'phone\'') !== false) {
+                return ["status" => 409, "message" => "Phone number already exists!"];
             }
+            return ["status" => 500, "message" => "Database error: " . $e->getMessage()];
         }
     }
     

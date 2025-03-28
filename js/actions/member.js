@@ -21,7 +21,7 @@ $(document).ready(function () {
                 data: null,
                 render: function (data, type, row) {
                     return `
-                        <button class="btn btn-sm btn-info edit-btn"  data-bs-toggle="modal" data-bs-target="#editMemberModal" data-id="${row.id}" data-name="${row.name}">Edit</button>
+                        <button class="btn btn-sm btn-info edit-btn"  data-bs-toggle="modal" data-bs-target="#editMemberModal" data-id="${row.id}" data-name="${row.name}" data-phone="${row.phone}">Edit</button>
                         <button class="btn btn-sm btn-danger delete-btn" data-id="${row.id}" data-name="${row.name}">Delete</button>
                     `;
                 }
@@ -79,47 +79,21 @@ $(document).ready(function () {
                 }             
             }
         });
-    });
+    });  
 
+    $('#membersTable').on('click', '.edit-btn', function () {
         
-    document.getElementById('change-password').addEventListener('change', function () {
-        
-        let passwordFields = document.querySelectorAll('#edit-password, #edit-confirm-password, #edit-show-password');
-        passwordFields.forEach(field => {
-            field.disabled = !this.checked;
-        });
-    });
-        
-    document.getElementById('edit-show-password').addEventListener('change', function () {
-        let passwordFields = document.querySelectorAll('#edit-password, #edit-confirm-password');
-        passwordFields.forEach(field => {
-            field.type = this.checked ? 'text' : 'password';
-        });
-    });
-
+        var memberId = $(this).data('id');
+        var name = $(this).data('name');
+        var phone = $(this).data('phone');
     
-
-    $('#librariansTable').on('click', '.edit-btn', function () {
-        
-        var userId = $(this).data('id');
-        var username = $(this).data('username');
-    
-        console.log(userId, username);
-    
-        $('#edit-id').val(userId);
-        $('#edit-username').val(username);
-        $('#change-password').prop('checked', false);
-        $('#edit-show-password').prop('checked', false);
-        $('#edit-password').val('').prop('disabled', true);
-        $('#edit-confirm-password').val('').prop('disabled', true);
-    
-        $('#change-password').on('change', function () {
-            $('#edit-password, #edit-confirm-password', '#edit-show-password').prop('disabled', !this.checked);
-        });
+        $('#edit-id').val(memberId);
+        $('#edit-name').val(name);
+        $('#edit-phone').val(phone);
     });
     
 
-    $(document).on('submit', '#librarianEdit-form', function (e) {
+    $(document).on('submit', '#memberEdit-form', function (e) {
         e.preventDefault();
 
         var formData = new FormData(this);
@@ -127,7 +101,7 @@ $(document).ready(function () {
 
         $.ajax({
             type: "POST",
-            url: "routes/librarian.php",
+            url: "routes/member.php",
             data: formData,
             contentType: false,
             processData: false,
@@ -141,7 +115,7 @@ $(document).ready(function () {
                         confirmButtonText: "OK",
                     }).then(() => {
                         table.ajax.reload();
-                        $('#editLibrarianModal').modal('hide');
+                        $('#editMemberModal').modal('hide');
                     });
                 }else if(response.status === 403){
                     Swal.fire({

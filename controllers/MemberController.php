@@ -41,30 +41,24 @@ class MemberController extends Member{
         }
         // print_r($post);exit;    
 
-        $createLibrarian = $this->memberCreate($name, $phone);
-        return json_encode($createLibrarian);
+        $createMember = $this->memberCreate($name, $phone);
+        return json_encode($createMember);
     }
 
-    public function updateLibrarian($post){
+    public function updateMember($post){
         // print_r($post);
         $id = $post['id'];
-        $username = $post['username'];
-        $password = $post['password'] ?? '';
-        $confirmPassword = $post['password_confirmation'] ?? '';
+        $name = $post['name'];
+        $phone = $post['phone'];
 
-        if(isset($post['changePassword'])){
-            $validation = $this->validate($username, $password, $confirmPassword);
-            
-            if ($validation['status'] !== 200) {
-                return json_encode($validation);
-            }
-
-            $updateLibarrian = $this->librarianUpdate($id, $username, $password);
-            return json_encode($updateLibarrian);
-            
+        $validation = $this->validate($name, $phone);
+        
+        if ($validation['status'] !== 200) {
+            return json_encode($validation);
         }
-        $updateLibarrian = $this->librarianUpdate($id, $username);
-        return json_encode($updateLibarrian);
+            
+        $updateMember = $this->memberUpdate($id, $name, $phone);
+        return json_encode($updateMember);
     }
 
     public function deleteLibrarian($post){
