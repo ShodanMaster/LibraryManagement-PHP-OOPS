@@ -153,4 +153,34 @@ class Librarian extends Dbconfig{
         }
     }
     
+    public function librarianDelete($id){
+        try{
+            $conn = $this->connect();
+            $conn->begin_transaction();
+
+            $sql = "SELECT id FROM users WHERE id = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("i", $id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if ($result->num_rows > 0) {
+                $sql = 'DELETE FROM users WHERE id = ?';
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param('i', $id);
+
+                if ($stmt->execute()) {
+                    $conn->commit();
+                    return ['status' => 200, 'message' => 'User Deleted Successfully'];
+                } else {
+                    $conn->rollback();
+                    return ["status" => 500, "message" => "User Delete Failed"];
+                }
+            }
+
+        } catch (mysqli_sql_exception $e) {
+            $conn->rollback();
+            return ["status" => 500, "message" => "Database Error: " . $e->getMessage()];
+        }
+    }
 }

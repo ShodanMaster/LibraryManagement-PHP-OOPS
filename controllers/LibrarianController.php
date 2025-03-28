@@ -68,6 +68,12 @@ class LibrarianController extends Librarian{
         return json_encode($updateLibarrian);
     }
 
+    public function deleteLibrarian($post){
+        $id = $post['userId'];
+        
+        $deleteUser = $this->librarianDelete($id);
+        return json_encode($deleteUser);
+    }
     private function validate($username, $password, $confirmPassword = null) {
         if (empty($username) || empty($password)) {
             return ["status" => 400, "message" => "Username and Password are required!"];

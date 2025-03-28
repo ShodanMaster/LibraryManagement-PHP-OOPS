@@ -32,4 +32,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $response = $librarian->updateLibrarian($_POST);
         echo $response;
     }
+    
+    if($action == 'delete'){
+        // print_r($_POST);exit;
+        $response = $librarian->deleteLibrarian($_POST);
+        echo $response;
+    }
 }
