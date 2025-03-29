@@ -36,7 +36,6 @@
                 <input type="text" class="form-control" name="name" id="edit-name" placeholder="Category Name" required>
             </div>
           </div>
-        </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
           <button type="submit" class="btn btn-primary">Save changes</button>

@@ -111,30 +111,30 @@ class Category extends Dbconfig{
         
     }
 
-    protected function memberUpdate($id, $name, $phone, $type) {
+    protected function categoryUpdate($id, $name) {
         try {
             $conn = $this->connect();
             $conn->begin_transaction();
     
-            $query = "SELECT id FROM members WHERE id = ?";
+            $query = "SELECT id FROM categories WHERE id = ?";
             $stmt = $conn->prepare($query);
             $stmt->bind_param("i", $id);
             $stmt->execute();
             $result = $stmt->get_result();
     
             if ($result->num_rows === 0) {
-                return ["status" => 404, "message" => "Member Not Found"];
+                return ["status" => 404, "message" => "Category Not Found"];
             }
             
-            $sql = "UPDATE members SET name = ?, phone = ?, membership_type = ? WHERE id = ?";
+            $sql = "UPDATE categories SET name = ? WHERE id = ?";
             $stmt = $conn->prepare($sql);
-            $stmt->bind_param("sssi", $name, $phone, $type, $id);
+            $stmt->bind_param("si", $name, $id);
     
             if ($stmt->execute()) {
                 $conn->commit();
                 return [
                     'status' => 200,
-                    'message' =>'Member Updated Successfully'
+                    'message' =>'Category Updated Successfully'
                 ];
             }
     

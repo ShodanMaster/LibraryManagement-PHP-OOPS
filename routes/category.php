@@ -29,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     if ($action == 'edit') {
         // print_r($_POST);exit;
-        $response = $category->updateMember($_POST);
+        $response = $category->updateCaregory($_POST);
         echo $response;
     }
     

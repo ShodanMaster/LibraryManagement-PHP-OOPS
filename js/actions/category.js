@@ -19,7 +19,7 @@ $(document).ready(function () {
                 data: null,
                 render: function (data, type, row) {
                     return `
-                        <button class="btn btn-sm btn-info edit-btn"  data-bs-toggle="modal" data-bs-target="#editMemberModal" data-id="${row.id}" data-name="${row.name}">Edit</button>
+                        <button class="btn btn-sm btn-info edit-btn"  data-bs-toggle="modal" data-bs-target="#editCategoryModal" data-id="${row.id}" data-name="${row.name}">Edit</button>
                         <button class="btn btn-sm btn-danger delete-btn" data-id="${row.id}" data-name="${row.name}">Delete</button>
                     `;
                 }
@@ -78,21 +78,17 @@ $(document).ready(function () {
         });
     });  
 
-    $('#membersTable').on('click', '.edit-btn', function () {
+    $('#categoriesTable').on('click', '.edit-btn', function () {
         
-        var memberId = $(this).data('id');
+        var categoryId = $(this).data('id');
         var name = $(this).data('name');
-        var phone = $(this).data('phone');
-        var type = $(this).data('type');
     
-        $('#edit-id').val(memberId);
+        $('#edit-id').val(categoryId);
         $('#edit-name').val(name);
-        $('#edit-phone').val(phone);
-        $('#edit-type').val(type);
     });
     
 
-    $(document).on('submit', '#memberEdit-form', function (e) {
+    $(document).on('submit', '#categoryEdit-form', function (e) {
         e.preventDefault();
 
         var formData = new FormData(this);
@@ -100,7 +96,7 @@ $(document).ready(function () {
 
         $.ajax({
             type: "POST",
-            url: "routes/member.php",
+            url: "routes/category.php",
             data: formData,
             contentType: false,
             processData: false,
@@ -114,7 +110,7 @@ $(document).ready(function () {
                         confirmButtonText: "OK",
                     }).then(() => {
                         table.ajax.reload();
-                        $('#addCategoryrModal').modal('hide');
+                        $('#editCategoryModal').modal('hide');
                     });
                 }else if(response.status === 403){
                     Swal.fire({

@@ -44,21 +44,19 @@ class CategoryController extends Category{
         return json_encode($createCategory);
     }
 
-    public function updateMember($post){
+    public function updateCaregory($post){
         // print_r($post);
         $id = $post['id'];
         $name = $post['name'];
-        $phone = $post['phone'];
-        $type = $post['type'];
 
-        $validation = $this->validate($name, $phone, $type);
+        $validation = $this->validate($name);
         
         if ($validation['status'] !== 200) {
             return json_encode($validation);
         }
             
-        $updateMember = $this->memberUpdate($id, $name, $phone,  $type);
-        return json_encode($updateMember);
+        $updateCategory = $this->categoryUpdate($id, $name);
+        return json_encode($updateCategory);
     }
 
     public function deleteLibrarian($post){
