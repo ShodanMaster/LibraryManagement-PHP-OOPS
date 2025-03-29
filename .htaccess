@@ -1,0 +1,12 @@
+RewriteEngine On
+RewriteBase /LibraryManagement-PHP-OOPS/
+
+# Allow direct access to existing files and directories
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Exclude the "action" directory from being rewritten
+RewriteCond %{REQUEST_URI} !^/LibraryManagement-PHP-OOPS/action/ [NC]
+
+# Redirect all other requests to index.php
+RewriteRule ^(.+)$ index.php?url=$1 [QSA,L]

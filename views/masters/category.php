@@ -55,7 +55,7 @@
 
 <div class="card shadow-lg">
   <div class="card-header bg-success text-white fs-4">
-    Categorys Table
+    Categories Table
   </div>
   <div class="card-body">
     <table id="categoriesTable" class="display">

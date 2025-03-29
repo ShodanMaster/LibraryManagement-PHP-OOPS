@@ -1,6 +1,8 @@
 <?php 
 
 include_once("config/session.php");
+
+$act = isset($_GET["act"]) ? $_GET["act"] : "";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -27,45 +29,43 @@ include_once("config/session.php");
             <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    Masters
-                </a>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="index.php?act=librarian">Librarian Master</a></li>
-                    <li><a class="dropdown-item" href="index.php?act=member">Member Master</a></li>
-                    <li><a class="dropdown-item" href="index.php?act=category">category Master</a></li>
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Masters
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="index.php?act=librarian">Librarian Master</a></li>
+                        <li><a class="dropdown-item" href="index.php?act=member">Member Master</a></li>
+                        <li><a class="dropdown-item" href="index.php?act=category">Category Master</a></li>
+                    </ul>
+                    </li>
+                    <li class="nav-item">
+                    <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+                    </li>
                 </ul>
-                </li>
-                <li class="nav-item">
-                <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-                </li>
-            </ul>
-            <form class="d-flex" role="search">
-                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success" type="submit">Search</button>
-            </form>
+                <form class="d-flex" action="routes/login.php?action=logout" method="POST">
+                    <button class="btn btn-outline-danger" type="submit">Logout</button>
+                </form>
             </div>
         </div>
     </nav>
     <div class="container mt-5">
     <?php 
-    $act = isset($_GET["act"]) ? $_GET["act"] : "";
 
-    switch ($act) {
-        case "":
-                echo "<h1>Library Management</h1>";
+        switch ($act) {
+            case "":
+                    echo "<h1>Library Management</h1>";
+                    break;
+            case "librarian": 
+                include "views/masters/librarian.php";
                 break;
-        case "librarian": 
-            include "views/masters/librarian.php";
-            break;
-        case "member": 
-            include "views/masters/member.php";
-            break;
-        case "category": 
-            include "views/masters/category.php";
-            break;
-    }
+            case "member": 
+                include "views/masters/member.php";
+                break;
+            case "category": 
+                include "views/masters/category.php";
+                break;
+        }
 
     
     ?>
