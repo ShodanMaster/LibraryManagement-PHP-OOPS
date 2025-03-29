@@ -1,14 +1,14 @@
 <?php
 
-require_once("../controllers/MemberController.php");
-$member = new MemberController();
+require_once("../controllers/CategoryController.php");
+$category = new CategoryController();
 
 $action = $_REQUEST['action'] ??'';
 
 header('Content-Type: application/json');
 
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
-    $response = $member->getMembers();
+    $response = $category->getCategories();
 
     if (!json_decode($response, true)) {
         echo json_encode(["status" => 500, "message" => "Invalid JSON response", "debug" => $response]);
@@ -23,19 +23,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     if($action == 'add'){
         // print_r($_POST);exit;
-        $response = $member->createMember($_POST);
+        $response = $category->createCategory($_POST);
         echo $response;
     }
     
     if ($action == 'edit') {
         // print_r($_POST);exit;
-        $response = $member->updateMember($_POST);
+        $response = $category->updateMember($_POST);
         echo $response;
     }
     
     // if($action == 'delete'){
     //     // print_r($_POST);exit;
-    //     $response = $member->deleteMember($_POST);
+    //     $response = $category->deleteMember($_POST);
     //     echo $response;
     // }
 }

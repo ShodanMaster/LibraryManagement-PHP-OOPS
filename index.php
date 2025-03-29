@@ -34,6 +34,7 @@ include_once("config/session.php");
                 <ul class="dropdown-menu">
                     <li><a class="dropdown-item" href="index.php?act=librarian">Librarian Master</a></li>
                     <li><a class="dropdown-item" href="index.php?act=member">Member Master</a></li>
+                    <li><a class="dropdown-item" href="index.php?act=category">category Master</a></li>
                 </ul>
                 </li>
                 <li class="nav-item">
@@ -60,6 +61,9 @@ include_once("config/session.php");
             break;
         case "member": 
             include "views/masters/member.php";
+            break;
+        case "category": 
+            include "views/masters/category.php";
             break;
     }
 
