@@ -59,11 +59,11 @@ class CategoryController extends Category{
         return json_encode($updateCategory);
     }
 
-    public function deleteLibrarian($post){
-        $id = $post['userId'];
+    public function deleteCategory($post){
+        $id = $post['categoryId'];
         
-        $deleteUser = $this->librarianDelete($id);
-        return json_encode($deleteUser);
+        $deleteCategory = $this->categoryDelete($id);
+        return json_encode($deleteCategory);
     }
 
     private function validate($name) {

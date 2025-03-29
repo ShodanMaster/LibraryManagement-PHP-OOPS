@@ -147,28 +147,28 @@ class Category extends Dbconfig{
         }
     }
     
-    public function librarianDelete($id){
+    public function categoryDelete($id){
         try{
             $conn = $this->connect();
             $conn->begin_transaction();
 
-            $sql = "SELECT id FROM users WHERE id = ?";
+            $sql = "SELECT id FROM categories WHERE id = ?";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("i", $id);
             $stmt->execute();
             $result = $stmt->get_result();
 
             if ($result->num_rows > 0) {
-                $sql = 'DELETE FROM users WHERE id = ?';
+                $sql = 'DELETE FROM categories WHERE id = ?';
                 $stmt = $conn->prepare($sql);
                 $stmt->bind_param('i', $id);
 
                 if ($stmt->execute()) {
                     $conn->commit();
-                    return ['status' => 200, 'message' => 'User Deleted Successfully'];
+                    return ['status' => 200, 'message' => 'Category Deleted Successfully'];
                 } else {
                     $conn->rollback();
-                    return ["status" => 500, "message" => "User Delete Failed"];
+                    return ["status" => 500, "message" => "Category Delete Failed"];
                 }
             }
 

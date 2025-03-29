@@ -33,9 +33,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo $response;
     }
     
-    // if($action == 'delete'){
-    //     // print_r($_POST);exit;
-    //     $response = $category->deleteMember($_POST);
-    //     echo $response;
-    // }
+    if($action == 'delete'){
+        // print_r($_POST);exit;
+        $response = $category->deleteCategory($_POST);
+        echo $response;
+    }
 }

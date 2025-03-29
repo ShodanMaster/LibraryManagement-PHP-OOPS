@@ -57,7 +57,7 @@ $(document).ready(function () {
                         confirmButtonText: "OK",
                     }).then(() => {
                         table.ajax.reload();
-                        $('#addCategoryrModal').modal('hide');
+                        $('#addCategoryModal').modal('hide');
                     });
                 }else if(response.status === 403){
                     Swal.fire({
@@ -132,13 +132,13 @@ $(document).ready(function () {
         
     });
 
-    $('#librariansTable').on('click', '.delete-btn', function(){
-        var userId = $(this).data('id');
-        var username = $(this).data('username');
+    $('#categoriesTable').on('click', '.delete-btn', function(){
+        var categoryId = $(this).data('id');
+        var name = $(this).data('name');
 
         Swal.fire({
-            title: "Are you sure delete "+ username +"?",
-            text: "You won't be able to revert this!",
+            title: "Are you sure delete "+ name +"?",
+            text: "You won't be able to revert this! Also Books Corresponding to this Category will be Deleted!",
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#d33",
@@ -148,16 +148,16 @@ $(document).ready(function () {
             if (result.isConfirmed) {
                 $.ajax({
                     type: "POST",
-                    url: "routes/librarian.php",
+                    url: "routes/category.php",
                     data: {
                         action: 'delete',
-                        userId: userId
+                        categoryId: categoryId
                     },
                     success: function (response) {
                         if (response.status === 200) {
                             Swal.fire(
                                 "Deleted!",
-                                username + " has been deleted.",
+                                name + " has been deleted.",
                                 "success"
                             );
                             table.draw();
@@ -172,7 +172,7 @@ $(document).ready(function () {
                     error: function() {
                         Swal.fire(
                             "Error!",
-                            "Failed to delete "+username,
+                            "Failed to delete "+name,
                             "error"
                         );
                     }
