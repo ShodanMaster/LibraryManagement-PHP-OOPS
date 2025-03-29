@@ -23,20 +23,20 @@ class Member extends Dbconfig{
             $stmt->execute();
             $totalRecords = $stmt->get_result()->fetch_assoc()['count'];
     
-            $query = "SELECT id, serial_no, name, phone FROM members WHERE 1";
+            $query = "SELECT id, serial_no, name, phone, membership_type, membership_updated, status FROM members WHERE 1";
             $params = [];
             $types = '';
     
             if (!empty($searchValue)) {
-                $query .= " AND (serial_no LIKE ? OR name LIKE ? OR phone LIKE ?)";
+                $query .= " AND (serial_no LIKE ? OR name LIKE ? OR phone LIKE ? OR membership_type LIKE ? OR status LIKE ?)";
                 $searchValue = "%$searchValue%";
-                $params = [$searchValue, $searchValue, $searchValue];
-                $types = "sss";
+                $params = [$searchValue, $searchValue, $searchValue, $searchValue, $searchValue];
+                $types = "sssss";
             }
     
             $filterQuery = "SELECT COUNT(*) as count FROM members WHERE 1";
             if (!empty($searchValue)) {
-                $filterQuery .= " AND (serial_no LIKE ? OR name LIKE ? OR phone LIKE ?)";
+                $filterQuery .= " AND (serial_no LIKE ? OR name LIKE ? OR phone LIKE ? OR membership_type LIKE ? OR status LIKE ?)";
             }
     
             $stmt = $conn->prepare($filterQuery);
@@ -79,7 +79,7 @@ class Member extends Dbconfig{
         }
     }    
 
-    protected function memberCreate($name, $phone){
+    protected function memberCreate($name, $phone, $type){
         // echo $username;exit;
         try{
             $conn = $this->connect();
@@ -88,11 +88,11 @@ class Member extends Dbconfig{
     
             $srlno = $this->makeSerialNo();
 
-            $query = "INSERT INTO members (serial_no, name, phone) VALUES (?, ?, ?)";
+            $query = "INSERT INTO members (serial_no, name, phone, membership_type) VALUES (?, ?, ?, ?)";
             // echo $query;exit;
             $stmt = $conn->prepare($query);
             
-            $stmt->bind_param("sss", $srlno, $name, $phone);
+            $stmt->bind_param("ssss", $srlno, $name, $phone, $type);
 
             if ($stmt->execute()) {
                 $conn->commit();
@@ -111,7 +111,7 @@ class Member extends Dbconfig{
         
     }
 
-    protected function memberUpdate($id, $name, $phone) {
+    protected function memberUpdate($id, $name, $phone, $type) {
         try {
             $conn = $this->connect();
             $conn->begin_transaction();
@@ -126,9 +126,9 @@ class Member extends Dbconfig{
                 return ["status" => 404, "message" => "Member Not Found"];
             }
             
-            $sql = "UPDATE members SET name = ?, phone = ? WHERE id = ?";
+            $sql = "UPDATE members SET name = ?, phone = ?, membership_type = ? WHERE id = ?";
             $stmt = $conn->prepare($sql);
-            $stmt->bind_param("ssi", $name, $phone, $id);
+            $stmt->bind_param("sssi", $name, $phone, $type, $id);
     
             if ($stmt->execute()) {
                 $conn->commit();

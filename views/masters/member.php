@@ -15,9 +15,16 @@
               </div>
             </div>
             <div class="col-md-6">
-              <div class="form-group">
+              <div class="form-group mb-2">
                 <input type="text" class="form-control" name="phone" id="phone" placeholder="Phone" required>
               </div>
+            </div>
+            <div class="col-md-12">
+              <select class="form-control" name="type" id="type" required>
+                <option value="" disabled selected>-- Select Membership Type --</option>
+                <option value="monthly">Monthly</option>
+                <option value="yearly">Yearly</option>
+              </select>
             </div>
           </div>
         </div>
@@ -52,6 +59,13 @@
                 <input type="text" class="form-control" name="phone" id="edit-phone" placeholder="Phone" required>
               </div>
             </div>
+            <div class="col-md-12">
+              <select class="form-control" name="type" id="edit-type" required>
+                <option value="" disabled selected>-- Select Membership Type --</option>
+                <option value="monthly">Monthly</option>
+                <option value="yearly">Yearly</option>
+              </select>
+            </div>
           </div>
         </div>
         <div class="modal-footer">
@@ -83,6 +97,9 @@
                   <th>Serial No</th>
                   <th>Name</th>
                   <th>Phone</th>
+                  <th>Membertship Type</th>
+                  <th>Membership Updated</th>
+                  <th>Status</th>
                   <th>Action</th>
               </tr>
           </thead>

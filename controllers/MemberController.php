@@ -33,15 +33,16 @@ class MemberController extends Member{
         // print_r($post);exit;    
         $name = $post['name'];
         $phone = $post['phone'];
+        $type = $post['type'];
         
-        $validation = $this->validate($name, $phone);
+        $validation = $this->validate($name, $phone, $type);
         
         if ($validation['status'] !== 200) {
             return json_encode($validation);
         }
         // print_r($post);exit;    
 
-        $createMember = $this->memberCreate($name, $phone);
+        $createMember = $this->memberCreate($name, $phone, $type);
         return json_encode($createMember);
     }
 
@@ -50,14 +51,15 @@ class MemberController extends Member{
         $id = $post['id'];
         $name = $post['name'];
         $phone = $post['phone'];
+        $type = $post['type'];
 
-        $validation = $this->validate($name, $phone);
+        $validation = $this->validate($name, $phone, $type);
         
         if ($validation['status'] !== 200) {
             return json_encode($validation);
         }
             
-        $updateMember = $this->memberUpdate($id, $name, $phone);
+        $updateMember = $this->memberUpdate($id, $name, $phone,  $type);
         return json_encode($updateMember);
     }
 
@@ -67,9 +69,10 @@ class MemberController extends Member{
         $deleteUser = $this->librarianDelete($id);
         return json_encode($deleteUser);
     }
-    private function validate($name, $phone) {
-        if (empty($name) || empty($phone)) {
-            return ["status" => 400, "message" => "Name and Phone are required!"];
+
+    private function validate($name, $phone, $type) {
+        if (empty($name) || empty($phone) || empty($type)) {
+            return ["status" => 400, "message" => "Name, Phone and Membership Type are required!"];
         }
     
         if (!preg_match('/^[a-zA-Z\s]{3,20}$/', $name)) {
@@ -79,6 +82,10 @@ class MemberController extends Member{
         if (!preg_match('/^[6-9]\d{9}$/', $phone)) {
             return ["status" => 400, "message" => "Phone number must be a valid 10-digit Indian mobile number starting with 6-9!"];
         }    
+
+        if (!in_array($type, ['monthly', 'yearly'])) {
+            return ["status" => 400, "message" => "Membership Type must be either 'monthly' or 'yearly'!"];
+        }
     
         return ["status" => 200, "message" => "Validation passed!"];
     }

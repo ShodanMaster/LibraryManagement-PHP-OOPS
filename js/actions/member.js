@@ -17,11 +17,14 @@ $(document).ready(function () {
             { data: "serial_no" },
             { data: "name" },
             { data: "phone" },
+            { data: "membership_type" },
+            { data: "membership_updated" },
+            { data: "status" },
             { 
                 data: null,
                 render: function (data, type, row) {
                     return `
-                        <button class="btn btn-sm btn-info edit-btn"  data-bs-toggle="modal" data-bs-target="#editMemberModal" data-id="${row.id}" data-name="${row.name}" data-phone="${row.phone}">Edit</button>
+                        <button class="btn btn-sm btn-info edit-btn"  data-bs-toggle="modal" data-bs-target="#editMemberModal" data-id="${row.id}" data-name="${row.name}" data-phone="${row.phone}" data-type="${row.membership_type}">Edit</button>
                         <button class="btn btn-sm btn-danger delete-btn" data-id="${row.id}" data-name="${row.name}">Delete</button>
                     `;
                 }
@@ -34,8 +37,7 @@ $(document).ready(function () {
     $('#addMemberModal').on('hidden.bs.modal', function () {
         $(this).find('form')[0].reset();
     });
-
-  
+ 
 
     $(document).on('submit', '#member-form', function (e) {
 
@@ -86,10 +88,12 @@ $(document).ready(function () {
         var memberId = $(this).data('id');
         var name = $(this).data('name');
         var phone = $(this).data('phone');
+        var type = $(this).data('type');
     
         $('#edit-id').val(memberId);
         $('#edit-name').val(name);
         $('#edit-phone').val(phone);
+        $('#edit-type').val(type);
     });
     
 
