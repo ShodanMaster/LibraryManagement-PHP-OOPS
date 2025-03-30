@@ -9,7 +9,12 @@
       <form id="book-form">
         <div class="modal-body">
             <div class="form-group mb-2">
-                <input type="text" class="form-control" name="name" id="name" placeholder="Book Name" required>
+                <select class="form-control" name="author" id="author">
+                    <option value="" disabled selected>--Select Author--</option>
+                </select>
+            </div>
+            <div class="form-group mb-2">
+                <input type="text" class="form-control" name="title" id="title" placeholder="Book title" required>
             </div>
         </div>
         <div class="modal-footer">
@@ -32,8 +37,13 @@
         <form id="bookEdit-form">
           <input type="hidden" name="id" id="edit-id">
           <div class="modal-body">
+          <div class="form-group mb-2">
+                <select class="form-control" name="author" id="edit-author">
+                    <option value="" disabled selected>--Select Author--</option>
+                </select>
+            </div>
             <div class="form-group mb-2">
-                <input type="text" class="form-control" name="name" id="edit-name" placeholder="Book Name" required>
+                <input type="text" class="form-control" name="title" id="edit-title" placeholder="Book Title" required>
             </div>
           </div>
         <div class="modal-footer">
@@ -62,6 +72,7 @@
           <thead>
               <tr>
                   <th>#</th>
+                  <th>Serial No</th>
                   <th>title</th>
                   <th>author</th>
                   <th>Action</th>

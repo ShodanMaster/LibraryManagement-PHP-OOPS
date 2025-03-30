@@ -14,13 +14,14 @@ $(document).ready(function () {
                     return meta.row + 1;
                 }
             },
+            { data: "serial_no" },
             { data: "title" },
             { data: "author" },
             { 
                 data: null,
                 render: function (data, type, row) {
                     return `
-                        <button class="btn btn-sm btn-info edit-btn"  data-bs-toggle="modal" data-bs-target="#editAuthorModal" data-id="${row.id}" data-name="${row.name}">Edit</button>
+                        <button class="btn btn-sm btn-info edit-btn" data-bs-toggle="modal" data-bs-target="#editBookModal" data-id="${row.id}" data-author="${row.author}" data-title="${row.title}">Edit</button>
                         <button class="btn btn-sm btn-danger delete-btn" data-id="${row.id}" data-name="${row.name}">Delete</button>
                     `;
                 }
@@ -30,12 +31,32 @@ $(document).ready(function () {
         lengthMenu: [[5, 10, 25, -1], [5, 10, 25, "All"]]
     });
 
-    $('#addAuthorModal').on('hidden.bs.modal', function () {
+    $.ajax({
+        url: "routes/author.php",
+        type: "GET",
+        dataType: "json",
+        success: function (response) {
+            let authorSelect = $("#author, #edit-author");
+            authorSelect.empty();
+    
+            authorSelect.append('<option value="" disabled selected>--Select Author--</option>');
+    
+            $.each(response.data, function (key, author) {
+                authorSelect.append(
+                    `<option value="${author.name}">${author.name}</option>`
+                );
+            });
+        },
+        error: function () {
+            alert("Failed to load authors.");
+        }
+    });    
+
+    $('#addBookModal').on('shown.bs.modal', function () {
         $(this).find('form')[0].reset();
     });
- 
 
-    $(document).on('submit', '#author-form', function (e) {
+    $(document).on('submit', '#book-form', function (e) {
 
         e.preventDefault();
 
@@ -44,7 +65,7 @@ $(document).ready(function () {
 
         $.ajax({
             type: "POST",
-            url: "routes/author.php",
+            url: "routes/book.php",
             data: formData,
             contentType: false,
             processData: false,
@@ -58,7 +79,7 @@ $(document).ready(function () {
                         confirmButtonText: "OK",
                     }).then(() => {
                         table.ajax.reload();
-                        $('#addAuthorModal').modal('hide');
+                        $('#addBookModal').modal('hide');
                     });
                 }else if(response.status === 403){
                     Swal.fire({
@@ -79,17 +100,19 @@ $(document).ready(function () {
         });
     });  
 
-    $('#authorsTable').on('click', '.edit-btn', function () {
+    $('#booksTable').on('click', '.edit-btn', function () {
         
-        var authorId = $(this).data('id');
-        var name = $(this).data('name');
+        var bookId = $(this).data('id');
+        var author = $(this).data('author');
+        var title = $(this).data('title');
     
-        $('#edit-id').val(authorId);
-        $('#edit-name').val(name);
+        $('#edit-id').val(bookId);
+        $('#edit-title').val(title);
+        $('#edit-author').val(author);
     });
     
 
-    $(document).on('submit', '#authorEdit-form', function (e) {
+    $(document).on('submit', '#bookEdit-form', function (e) {
         e.preventDefault();
 
         var formData = new FormData(this);
@@ -111,7 +134,7 @@ $(document).ready(function () {
                         confirmButtonText: "OK",
                     }).then(() => {
                         table.ajax.reload();
-                        $('#editAuthorModal').modal('hide');
+                        $('#editBookModal').modal('hide');
                     });
                 }else if(response.status === 403){
                     Swal.fire({

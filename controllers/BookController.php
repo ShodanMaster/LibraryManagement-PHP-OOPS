@@ -29,34 +29,35 @@ class BookController extends Book{
         return json_encode($books);
     }
 
-    public function createAuthor($post){
+    public function createBook($post){
         // print_r($post);exit;    
-        $name = $post['name'];
+        $author = $post['author'];
+        $title = $post['title'];
         
-        $validation = $this->validate($name);
+        $validation = $this->validate($title, $author);
         
         if ($validation['status'] !== 200) {
             return json_encode($validation);
         }
-        // print_r($post);exit;    
 
-        $createAuthor = $this->authorCreate($name);
-        return json_encode($createAuthor);
+        $createBook = $this->bookCreate($title, $author);
+        return json_encode($createBook);
     }
 
-    public function updateAuthor($post){
+    public function updateBook($post){
         // print_r($post);
         $id = $post['id'];
-        $name = $post['name'];
+        $title = $post['title'];
+        $author = $post['author'];
 
-        $validation = $this->validate($name);
+        $validation = $this->validate($title, $author);
         
         if ($validation['status'] !== 200) {
             return json_encode($validation);
         }
             
-        $updateAuthor = $this->authorUpdate($id, $name);
-        return json_encode($updateAuthor);
+        $updateBook = $this->authorUpdate($id, $author, $title);
+        return json_encode($updateBook);
     }
 
     public function deleteAuthor($post){
@@ -66,13 +67,13 @@ class BookController extends Book{
         return json_encode($deleteAuthor);
     }
 
-    private function validate($name) {
-        if (empty($name)) {
-            return ["status" => 400, "message" => "Name Type are required!"];
+    private function validate($title, $author) {
+        if (empty($title) || empty($author)) {
+            return ["status" => 400, "message" => "Title and Author are required!"];
         }
     
-        if (!preg_match('/^[a-zA-Z\s]{3,20}$/', $name)) {
-            return ["status" => 400, "message" => "Name must be 3-20 characters long and contain only letters and spaces!"];
+        if (!preg_match('/^[a-zA-Z\s]{3,20}$/', $title)) {
+            return ["status" => 400, "message" => "Title must be 3-20 characters long and contain only letters and spaces!"];
         }
     
         return ["status" => 200, "message" => "Validation passed!"];
