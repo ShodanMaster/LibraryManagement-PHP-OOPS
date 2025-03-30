@@ -1,8 +1,8 @@
 <?php
 session_start();
-require_once("../models/Category.php");
+require_once("../models/Author.php");
 
-class CategoryController extends Category{
+class AuthorController extends Author{
     
     private $userId;
 
@@ -13,23 +13,23 @@ class CategoryController extends Category{
         }
     }
 
-    public function getCategories(){
-        $categoriesJson = $this->categoriesGet();
+    public function getAuthors(){
+        $authorsJson = $this->authorsGet();
 
-        $categories = json_decode($categoriesJson, true);
+        $authors = json_decode($authorsJson, true);
         
-        if ($categories === null || !isset($categories['data'])) {
+        if ($authors === null || !isset($authors['data'])) {
             return json_encode([
                 "status" => 500,
-                "message" => "Invalid JSON response from getCategories()",
-                "debug" => $categoriesJson
+                "message" => "Invalid JSON response from getAuthors()",
+                "debug" => $authorsJson
             ]);
         }
 
-        return json_encode($categories);
+        return json_encode($authors);
     }
 
-    public function createCategory($post){
+    public function createAuthor($post){
         // print_r($post);exit;    
         $name = $post['name'];
         
@@ -40,11 +40,11 @@ class CategoryController extends Category{
         }
         // print_r($post);exit;    
 
-        $createCategory = $this->categoryCreate($name);
-        return json_encode($createCategory);
+        $createAuthor = $this->authorCreate($name);
+        return json_encode($createAuthor);
     }
 
-    public function updateCategory($post){
+    public function updateCaregory($post){
         // print_r($post);
         $id = $post['id'];
         $name = $post['name'];

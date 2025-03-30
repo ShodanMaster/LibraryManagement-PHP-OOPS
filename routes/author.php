@@ -1,14 +1,14 @@
 <?php
 
-require_once("../controllers/CategoryController.php");
-$category = new CategoryController();
+require_once("../controllers/AuthorController.php");
+$author = new AuthorController();
 
 $action = $_REQUEST['action'] ??'';
 
 header('Content-Type: application/json');
 
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
-    $response = $category->getCategories();
+    $response = $author->getAuthors();
 
     if (!json_decode($response, true)) {
         echo json_encode(["status" => 500, "message" => "Invalid JSON response", "debug" => $response]);
@@ -23,19 +23,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     if($action == 'add'){
         // print_r($_POST);exit;
-        $response = $category->createCategory($_POST);
+        $response = $author->createAuthor($_POST);
         echo $response;
     }
     
     if ($action == 'edit') {
         // print_r($_POST);exit;
-        $response = $category->updateCategory($_POST);
+        $response = $author->updateCaregory($_POST);
         echo $response;
     }
     
     if($action == 'delete'){
         // print_r($_POST);exit;
-        $response = $category->deleteCategory($_POST);
+        $response = $author->deleteauthor($_POST);
         echo $response;
     }
 }
