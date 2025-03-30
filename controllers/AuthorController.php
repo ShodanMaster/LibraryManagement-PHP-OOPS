@@ -44,7 +44,7 @@ class AuthorController extends Author{
         return json_encode($createAuthor);
     }
 
-    public function updateCaregory($post){
+    public function updateAuthor($post){
         // print_r($post);
         $id = $post['id'];
         $name = $post['name'];
@@ -55,8 +55,8 @@ class AuthorController extends Author{
             return json_encode($validation);
         }
             
-        $updateCategory = $this->categoryUpdate($id, $name);
-        return json_encode($updateCategory);
+        $updateAuthor = $this->authorUpdate($id, $name);
+        return json_encode($updateAuthor);
     }
 
     public function deleteCategory($post){

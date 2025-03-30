@@ -29,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     if ($action == 'edit') {
         // print_r($_POST);exit;
-        $response = $author->updateCaregory($_POST);
+        $response = $author->updateAuthor($_POST);
         echo $response;
     }
     

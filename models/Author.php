@@ -111,22 +111,22 @@ class Author extends Dbconfig{
         
     }
 
-    protected function categoryUpdate($id, $name) {
+    protected function authorUpdate($id, $name) {
         try {
             $conn = $this->connect();
             $conn->begin_transaction();
     
-            $query = "SELECT id FROM categories WHERE id = ?";
+            $query = "SELECT id FROM authors WHERE id = ?";
             $stmt = $conn->prepare($query);
             $stmt->bind_param("i", $id);
             $stmt->execute();
             $result = $stmt->get_result();
     
             if ($result->num_rows === 0) {
-                return ["status" => 404, "message" => "Category Not Found"];
+                return ["status" => 404, "message" => "Author Not Found"];
             }
             
-            $sql = "UPDATE categories SET name = ? WHERE id = ?";
+            $sql = "UPDATE authors SET name = ? WHERE id = ?";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("si", $name, $id);
     
@@ -134,7 +134,7 @@ class Author extends Dbconfig{
                 $conn->commit();
                 return [
                     'status' => 200,
-                    'message' =>'Category Updated Successfully'
+                    'message' =>'Author Updated Successfully'
                 ];
             }
     
@@ -152,14 +152,14 @@ class Author extends Dbconfig{
             $conn = $this->connect();
             $conn->begin_transaction();
 
-            $sql = "SELECT id FROM categories WHERE id = ?";
+            $sql = "SELECT id FROM authors WHERE id = ?";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("i", $id);
             $stmt->execute();
             $result = $stmt->get_result();
 
             if ($result->num_rows > 0) {
-                $sql = 'DELETE FROM categories WHERE id = ?';
+                $sql = 'DELETE FROM authors WHERE id = ?';
                 $stmt = $conn->prepare($sql);
                 $stmt->bind_param('i', $id);
 
