@@ -159,13 +159,18 @@ class Category extends Dbconfig{
             $result = $stmt->get_result();
 
             if ($result->num_rows > 0) {
+                $sql = "DELETE FROM books WHERE category_id = ?";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("i", $id);
+                $stmt->execute();
+                
                 $sql = 'DELETE FROM categories WHERE id = ?';
                 $stmt = $conn->prepare($sql);
                 $stmt->bind_param('i', $id);
 
                 if ($stmt->execute()) {
                     $conn->commit();
-                    return ['status' => 200, 'message' => 'Category Deleted Successfully'];
+                    return ['status' => 200, 'message' => 'Category and related books deleted successfully'];
                 } else {
                     $conn->rollback();
                     return ["status" => 500, "message" => "Category Delete Failed"];
