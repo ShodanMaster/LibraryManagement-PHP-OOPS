@@ -2,7 +2,7 @@
 // session_start();
 require_once("../config/Dbconfig.php");
 
-class Category extends Dbconfig{
+class Book extends Dbconfig{
 
     public function __construct(){
         if(isset($_SESSION["role"]) && !$_SESSION["role"] === "admin"){
@@ -10,7 +10,7 @@ class Category extends Dbconfig{
         }
     }
 
-    protected function categoriesGet() {
+    protected function booksGet() {
         try {
             $conn = $this->connect();
     
@@ -19,24 +19,27 @@ class Category extends Dbconfig{
             $length = $_GET['length'] ?? 10;
             $searchValue = $_GET['search']['value'] ?? '';
             
-            $stmt = $conn->prepare("SELECT COUNT(*) as count FROM categories");
+            $stmt = $conn->prepare("SELECT COUNT(*) as count FROM books");
             $stmt->execute();
             $totalRecords = $stmt->get_result()->fetch_assoc()['count'];
             
-            $query = "SELECT id, name FROM categories WHERE 1";
+            $query = "SELECT books.id, books.author_id,books.title AS title, authors.name AS author 
+                        FROM books 
+                        INNER JOIN authors on books.author_id = authors.id WHERE 1";
             $params = [];
             $types = '';
+
     
             if (!empty($searchValue)) {
-                $query .= " AND (name LIKE ?)";
+                $query .= " AND (title LIKE ?) AND (author LIKE ?)";
                 $searchValue = "%$searchValue%";
-                $params = [$searchValue];
-                $types = "s";
+                $params = [$searchValue, $searchValue];
+                $types = "ss";
             }
             
-            $filterQuery = "SELECT COUNT(*) as count FROM categories WHERE 1";
+            $filterQuery = "SELECT COUNT(*) as count FROM books WHERE 1";
             if (!empty($searchValue)) {
-                $filterQuery .= " AND (name LIKE ?)";
+                $filterQuery .= " AND (name LIKE ?) AND (author LIKE ?)";
             }
     
             $stmt = $conn->prepare($filterQuery);
@@ -79,7 +82,7 @@ class Category extends Dbconfig{
         }
     }        
 
-    protected function categoryCreate($name){
+    protected function authorCreate($name){
         // echo $username;exit;
         try{
             $conn = $this->connect();
@@ -88,7 +91,7 @@ class Category extends Dbconfig{
     
             $srlno = $this->makeSerialNo();
 
-            $query = "INSERT INTO categories (name) VALUES (?)";
+            $query = "INSERT INTO books (name) VALUES (?)";
             // echo $query;exit;
             $stmt = $conn->prepare($query);
             
@@ -96,37 +99,37 @@ class Category extends Dbconfig{
 
             if ($stmt->execute()) {
                 $conn->commit();
-                return ["status" => 200, "message" => "Category Created successful!"];
+                return ["status" => 200, "message" => "Author Created successful!"];
             } else {
                 $conn->rollback();
-                return ["status" => 500, "message" => "Category Create failed!"];
+                return ["status" => 500, "message" => "Author Create failed!"];
             }
         } catch (mysqli_sql_exception $e) {
             $conn->rollback();
             if (strpos($e->getMessage(), 'Duplicate entry') !== false && strpos($e->getMessage(), 'for key \'name\'') !== false) {
-                return ["status" => 409, "message" => "Category already exists!"];
+                return ["status" => 409, "message" => "Author already exists!"];
             }
             return ["status" => 500, "message" => "Database error: " . $e->getMessage()];
         }        
         
     }
 
-    protected function categoryUpdate($id, $name) {
+    protected function authorUpdate($id, $name) {
         try {
             $conn = $this->connect();
             $conn->begin_transaction();
     
-            $query = "SELECT id FROM categories WHERE id = ?";
+            $query = "SELECT id FROM books WHERE id = ?";
             $stmt = $conn->prepare($query);
             $stmt->bind_param("i", $id);
             $stmt->execute();
             $result = $stmt->get_result();
     
             if ($result->num_rows === 0) {
-                return ["status" => 404, "message" => "Category Not Found"];
+                return ["status" => 404, "message" => "Author Not Found"];
             }
             
-            $sql = "UPDATE categories SET name = ? WHERE id = ?";
+            $sql = "UPDATE books SET name = ? WHERE id = ?";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("si", $name, $id);
     
@@ -134,41 +137,41 @@ class Category extends Dbconfig{
                 $conn->commit();
                 return [
                     'status' => 200,
-                    'message' =>'Category Updated Successfully'
+                    'message' =>'Author Updated Successfully'
                 ];
             }
     
         } catch (mysqli_sql_exception $e) {
             $conn->rollback();
             if (strpos($e->getMessage(), 'Duplicate entry') !== false && strpos($e->getMessage(), 'for key \'name\'') !== false) {
-                return ["status" => 409, "message" => "Name already exists!"];
+                return ["status" => 409, "message" => "Author already exists!"];
             }
             return ["status" => 500, "message" => "Database error: " . $e->getMessage()];
         }
     }
     
-    public function categoryDelete($id){
+    public function authorDelete($id){
         try{
             $conn = $this->connect();
             $conn->begin_transaction();
 
-            $sql = "SELECT id FROM categories WHERE id = ?";
+            $sql = "SELECT id FROM books WHERE id = ?";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("i", $id);
             $stmt->execute();
             $result = $stmt->get_result();
 
             if ($result->num_rows > 0) {
-                $sql = 'DELETE FROM categories WHERE id = ?';
+                $sql = 'DELETE FROM authors WHERE id = ?';
                 $stmt = $conn->prepare($sql);
                 $stmt->bind_param('i', $id);
 
                 if ($stmt->execute()) {
                     $conn->commit();
-                    return ['status' => 200, 'message' => 'Category Deleted Successfully'];
+                    return ['status' => 200, 'message' => 'Author Deleted Successfully'];
                 } else {
                     $conn->rollback();
-                    return ["status" => 500, "message" => "Category Delete Failed"];
+                    return ["status" => 500, "message" => "Author Delete Failed"];
                 }
             }
 

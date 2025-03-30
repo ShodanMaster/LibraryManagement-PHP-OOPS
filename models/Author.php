@@ -140,8 +140,8 @@ class Author extends Dbconfig{
     
         } catch (mysqli_sql_exception $e) {
             $conn->rollback();
-            if (strpos($e->getMessage(), 'Duplicate entry') !== false && strpos($e->getMessage(), 'for key \'phone\'') !== false) {
-                return ["status" => 409, "message" => "Phone number already exists!"];
+            if (strpos($e->getMessage(), 'Duplicate entry') !== false && strpos($e->getMessage(), 'for key \'name\'') !== false) {
+                return ["status" => 409, "message" => "Author already exists!"];
             }
             return ["status" => 500, "message" => "Database error: " . $e->getMessage()];
         }
