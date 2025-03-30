@@ -59,11 +59,11 @@ class AuthorController extends Author{
         return json_encode($updateAuthor);
     }
 
-    public function deleteCategory($post){
-        $id = $post['categoryId'];
+    public function deleteAuthor($post){
+        $id = $post['authorId'];
         
-        $deleteCategory = $this->categoryDelete($id);
-        return json_encode($deleteCategory);
+        $deleteAuthor = $this->authorDelete($id);
+        return json_encode($deleteAuthor);
     }
 
     private function validate($name) {

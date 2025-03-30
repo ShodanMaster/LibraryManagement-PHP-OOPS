@@ -35,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     if($action == 'delete'){
         // print_r($_POST);exit;
-        $response = $author->deleteauthor($_POST);
+        $response = $author->deleteAuthor($_POST);
         echo $response;
     }
 }

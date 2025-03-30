@@ -147,7 +147,7 @@ class Author extends Dbconfig{
         }
     }
     
-    public function categoryDelete($id){
+    public function authorDelete($id){
         try{
             $conn = $this->connect();
             $conn->begin_transaction();
@@ -165,10 +165,10 @@ class Author extends Dbconfig{
 
                 if ($stmt->execute()) {
                     $conn->commit();
-                    return ['status' => 200, 'message' => 'Category Deleted Successfully'];
+                    return ['status' => 200, 'message' => 'Author Deleted Successfully'];
                 } else {
                     $conn->rollback();
-                    return ["status" => 500, "message" => "Category Delete Failed"];
+                    return ["status" => 500, "message" => "Author Delete Failed"];
                 }
             }
 
