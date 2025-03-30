@@ -31,16 +31,17 @@ class BookController extends Book{
 
     public function createBook($post){
         // print_r($post);exit;    
+        $category = $post['category'];
         $author = $post['author'];
         $title = $post['title'];
         
-        $validation = $this->validate($title, $author);
+        $validation = $this->validate($title, $author, $category);
         
         if ($validation['status'] !== 200) {
             return json_encode($validation);
         }
 
-        $createBook = $this->bookCreate($title, $author);
+        $createBook = $this->bookCreate($title, $author, $category);
         return json_encode($createBook);
     }
 
@@ -48,31 +49,32 @@ class BookController extends Book{
         // print_r($post);
         $id = $post['id'];
         $title = $post['title'];
+        $category = $post['category'];
         $author = $post['author'];
 
-        $validation = $this->validate($title, $author);
+        $validation = $this->validate($title, $author, $category);
         
         if ($validation['status'] !== 200) {
             return json_encode($validation);
         }
             
-        $updateBook = $this->authorUpdate($id, $author, $title);
+        $updateBook = $this->bookUpdate($id, $author, $title, $category);
         return json_encode($updateBook);
     }
 
-    public function deleteAuthor($post){
-        $id = $post['authorId'];
+    public function deleteBook($post){
+        $id = $post['bookId'];
         
-        $deleteAuthor = $this->authorDelete($id);
+        $deleteAuthor = $this->bookDelete($id);
         return json_encode($deleteAuthor);
     }
 
-    private function validate($title, $author) {
-        if (empty($title) || empty($author)) {
-            return ["status" => 400, "message" => "Title and Author are required!"];
+    private function validate($title, $author, $category) {
+        if (empty($title) || empty($author) || empty($category)) {
+            return ["status" => 400, "message" => "Category, Title and Author are required!"];
         }
     
-        if (!preg_match('/^[a-zA-Z\s]{3,20}$/', $title)) {
+        if (!preg_match('/^[a-zA-Z\s]{3,200}$/', $title)) {
             return ["status" => 400, "message" => "Title must be 3-20 characters long and contain only letters and spaces!"];
         }
     

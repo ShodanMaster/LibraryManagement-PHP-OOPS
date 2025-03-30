@@ -8,12 +8,23 @@
       </div>
       <form id="book-form">
         <div class="modal-body">
-            <div class="form-group mb-2">
-                <select class="form-control" name="author" id="author">
-                    <option value="" disabled selected>--Select Author--</option>
-                </select>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <select class="form-control" name="category" id="category">
+                            <option value="" disabled selected>--Select Category--</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <select class="form-control" name="author" id="author">
+                            <option value="" disabled selected>--Select Author--</option>
+                        </select>
+                    </div>
+                </div>
             </div>
-            <div class="form-group mb-2">
+            <div class="form-group mt-2">
                 <input type="text" class="form-control" name="title" id="title" placeholder="Book title" required>
             </div>
         </div>
@@ -37,12 +48,23 @@
         <form id="bookEdit-form">
           <input type="hidden" name="id" id="edit-id">
           <div class="modal-body">
-          <div class="form-group mb-2">
-                <select class="form-control" name="author" id="edit-author">
-                    <option value="" disabled selected>--Select Author--</option>
-                </select>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <select class="form-control" name="category" id="edit-category">
+                            <option value="" disabled selected>--Select Category--</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group ">
+                        <select class="form-control" name="author" id="edit-author">
+                            <option value="" disabled selected>--Select Author--</option>
+                        </select>
+                    </div>
+                </div>
             </div>
-            <div class="form-group mb-2">
+            <div class="form-group mt-2">
                 <input type="text" class="form-control" name="title" id="edit-title" placeholder="Book Title" required>
             </div>
           </div>
@@ -73,6 +95,7 @@
               <tr>
                   <th>#</th>
                   <th>Serial No</th>
+                  <th>Category</th>
                   <th>title</th>
                   <th>author</th>
                   <th>Action</th>

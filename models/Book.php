@@ -23,24 +23,26 @@ class Book extends Dbconfig{
             $stmt->execute();
             $totalRecords = $stmt->get_result()->fetch_assoc()['count'];
     
-            $query = "SELECT books.id, books.serial_no, books.author_id, books.title, authors.name AS author 
+            $query = "SELECT books.id, books.serial_no, books.author_id, books.title, authors.name AS author , categories.name AS category 
                       FROM books 
                       INNER JOIN authors ON books.author_id = authors.id 
+                      INNER JOIN categories ON books.category_id = categories.id 
                       WHERE 1";
     
             $filterQuery = "SELECT COUNT(*) as count 
                             FROM books 
                             INNER JOIN authors ON books.author_id = authors.id 
+                            INNER JOIN categories ON books.category_id = categories.id 
                             WHERE 1";
     
             $params = [];
             $types = "";
     
             if (!empty($searchValue)) {
-                $query .= " AND (books.serial_no LIKE ? OR books.title LIKE ? OR authors.name LIKE ?)";
-                $filterQuery .= " AND (books.serial_no LIKE ? OR books.title LIKE ? OR authors.name LIKE ?)";
+                $query .= " AND (books.serial_no LIKE ? OR books.title LIKE ? OR authors.name LIKE ? OR categories.name LIKE ?)";
+                $filterQuery .= " AND (books.serial_no LIKE ? OR books.title LIKE ? OR authors.name LIKE ? OR categories.name LIKE ?)";
                 $searchValue = "%$searchValue%";
-                $params = [$searchValue, $searchValue, $searchValue];
+                $params = [$searchValue, $searchValue, $searchValue, $searchValue];
                 $types = "sss";
             }
     
@@ -85,7 +87,7 @@ class Book extends Dbconfig{
     }
           
 
-    protected function bookCreate($title, $author){
+    protected function bookCreate($title, $author, $category){
         // echo $author;exit;
         try{
 
@@ -96,16 +98,21 @@ class Book extends Dbconfig{
             $srlno = $this->makeSerialNo();
 
             $authorId = $this->fetchAuthorId($author);
+            $categoryId = $this->fetchCategoryId($category);
 
             if(!$authorId){
                 return ["status" => 404, "message" => "Author Not Found"];
             }
 
-            $query = "INSERT INTO books (serial_no, author_id, title) VALUES (?, ?, ?)";
+            if(!$categoryId){
+                return ["status" => 404, "message" => "Category Not Found"];
+            }
+
+            $query = "INSERT INTO books (serial_no, category_id, author_id, title) VALUES (?, ?, ?, ?)";
             // echo $query;exit;
             $stmt = $conn->prepare($query);
             
-            $stmt->bind_param("sis", $srlno, $authorId,$title);
+            $stmt->bind_param("siis", $srlno, $categoryId, $authorId,$title);
 
             if ($stmt->execute()) {
                 $conn->commit();
@@ -121,10 +128,21 @@ class Book extends Dbconfig{
         
     }
 
-    protected function authorUpdate($id, $name) {
+    protected function bookUpdate($id, $author, $title, $category) {
         try {
             $conn = $this->connect();
             $conn->begin_transaction();
+
+            $authorId = $this->fetchAuthorId($author);
+            $categoryId = $this->fetchCategoryId($category);
+
+            if(!$authorId){
+                return ["status" => 404, "message" => "Author Not Found"];
+            }
+            
+            if(!$categoryId){
+                return ["status" => 404, "message" => "Category Not Found"];
+            }
     
             $query = "SELECT id FROM books WHERE id = ?";
             $stmt = $conn->prepare($query);
@@ -133,31 +151,28 @@ class Book extends Dbconfig{
             $result = $stmt->get_result();
     
             if ($result->num_rows === 0) {
-                return ["status" => 404, "message" => "Author Not Found"];
+                return ["status" => 404, "message" => "Book Not Found"];
             }
             
-            $sql = "UPDATE books SET name = ? WHERE id = ?";
+            $sql = "UPDATE books SET title = ?, author_id = ?, category_id = ? WHERE id = ?";
             $stmt = $conn->prepare($sql);
-            $stmt->bind_param("si", $name, $id);
+            $stmt->bind_param("siii", $title, $authorId, $categoryId, $id);
     
             if ($stmt->execute()) {
                 $conn->commit();
                 return [
                     'status' => 200,
-                    'message' =>'Author Updated Successfully'
+                    'message' =>'Book Updated Successfully'
                 ];
             }
     
         } catch (mysqli_sql_exception $e) {
             $conn->rollback();
-            if (strpos($e->getMessage(), 'Duplicate entry') !== false && strpos($e->getMessage(), 'for key \'name\'') !== false) {
-                return ["status" => 409, "message" => "Author already exists!"];
-            }
             return ["status" => 500, "message" => "Database error: " . $e->getMessage()];
         }
     }
     
-    public function authorDelete($id){
+    public function bookDelete($id){
         try{
             $conn = $this->connect();
             $conn->begin_transaction();
@@ -169,16 +184,16 @@ class Book extends Dbconfig{
             $result = $stmt->get_result();
 
             if ($result->num_rows > 0) {
-                $sql = 'DELETE FROM authors WHERE id = ?';
+                $sql = 'DELETE FROM books WHERE id = ?';
                 $stmt = $conn->prepare($sql);
                 $stmt->bind_param('i', $id);
 
                 if ($stmt->execute()) {
                     $conn->commit();
-                    return ['status' => 200, 'message' => 'Author Deleted Successfully'];
+                    return ['status' => 200, 'message' => 'Book Deleted Successfully'];
                 } else {
                     $conn->rollback();
-                    return ["status" => 500, "message" => "Author Delete Failed"];
+                    return ["status" => 500, "message" => "Book Delete Failed"];
                 }
             }
 
@@ -220,6 +235,24 @@ class Book extends Dbconfig{
     
         $stmt->close();
         return $authorId;
+    }
+
+    private function fetchCategoryId($category) {
+        $conn = $this->connect();
+    
+        $query = "SELECT id FROM categories WHERE name = ?";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("s", $category);
+        $stmt->execute();
+        $result = $stmt->get_result();
+    
+        $categoryId = null;
+        if ($result && $row = $result->fetch_assoc()) {
+            $categoryId = $row['id'];
+        }
+    
+        $stmt->close();
+        return $categoryId;
     }
     
     
