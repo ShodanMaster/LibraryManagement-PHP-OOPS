@@ -186,7 +186,7 @@ $(document).ready(function () {
 
         Swal.fire({
             title: "Are you sure delete "+ name +"?",
-            text: "You won't be able to revert this! Also Books Corresponding to this Book will be Deleted!",
+            text: "You won't be able to revert this!",
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#d33",

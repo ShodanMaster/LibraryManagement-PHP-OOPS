@@ -12,4 +12,23 @@ class BookTransactionController extends BookTransaction{
             header("index.php");
         }
     }
+
+    public function fetchData($member,$book){
+        $dataJson = $this->dataFetch($member, $book);
+
+        return json_encode($dataJson);
+    }
+
+    public function saveTransaction($post){
+        
+        $memberId = $post["memberId"];
+        $booksIds = $post["bookIds"];
+        
+        $bookIdsArray = json_decode($booksIds, true);
+        
+        
+        $transactionSave = $this->transactionSave($memberId,$bookIdsArray);
+
+        return json_encode($transactionSave);
+    }
 }
