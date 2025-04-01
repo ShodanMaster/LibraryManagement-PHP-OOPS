@@ -1,10 +1,10 @@
 $(document).ready(function () {
 
-    var table = $('#authorsTable').DataTable({
+    var table = $('#membersTable').DataTable({
         processing: true,
         serverSide: true,
         ajax: {
-            url: "routes/author.php",
+            url: "routes/masters/Member.php",
             type: "GET"
         },
         columns: [
@@ -14,12 +14,17 @@ $(document).ready(function () {
                     return meta.row + 1;
                 }
             },
+            { data: "serial_no" },
             { data: "name" },
+            { data: "phone" },
+            { data: "membership_type" },
+            { data: "membership_updated" },
+            { data: "status" },
             { 
                 data: null,
                 render: function (data, type, row) {
                     return `
-                        <button class="btn btn-sm btn-info edit-btn"  data-bs-toggle="modal" data-bs-target="#editAuthorModal" data-id="${row.id}" data-name="${row.name}">Edit</button>
+                        <button class="btn btn-sm btn-info edit-btn"  data-bs-toggle="modal" data-bs-target="#editMemberModal" data-id="${row.id}" data-name="${row.name}" data-phone="${row.phone}" data-type="${row.membership_type}">Edit</button>
                         <button class="btn btn-sm btn-danger delete-btn" data-id="${row.id}" data-name="${row.name}">Delete</button>
                     `;
                 }
@@ -29,12 +34,12 @@ $(document).ready(function () {
         lengthMenu: [[5, 10, 25, -1], [5, 10, 25, "All"]]
     });
 
-    $('#addAuthorModal').on('hidden.bs.modal', function () {
+    $('#addMemberModal').on('hidden.bs.modal', function () {
         $(this).find('form')[0].reset();
     });
  
 
-    $(document).on('submit', '#author-form', function (e) {
+    $(document).on('submit', '#member-form', function (e) {
 
         e.preventDefault();
 
@@ -43,7 +48,7 @@ $(document).ready(function () {
 
         $.ajax({
             type: "POST",
-            url: "routes/author.php",
+            url: "routes/masters/member.php",
             data: formData,
             contentType: false,
             processData: false,
@@ -57,7 +62,7 @@ $(document).ready(function () {
                         confirmButtonText: "OK",
                     }).then(() => {
                         table.ajax.reload();
-                        $('#addAuthorModal').modal('hide');
+                        $('#addMemberModal').modal('hide');
                     });
                 }else if(response.status === 403){
                     Swal.fire({
@@ -78,17 +83,21 @@ $(document).ready(function () {
         });
     });  
 
-    $('#authorsTable').on('click', '.edit-btn', function () {
+    $('#membersTable').on('click', '.edit-btn', function () {
         
-        var authorId = $(this).data('id');
+        var memberId = $(this).data('id');
         var name = $(this).data('name');
+        var phone = $(this).data('phone');
+        var type = $(this).data('type');
     
-        $('#edit-id').val(authorId);
+        $('#edit-id').val(memberId);
         $('#edit-name').val(name);
+        $('#edit-phone').val(phone);
+        $('#edit-type').val(type);
     });
     
 
-    $(document).on('submit', '#authorEdit-form', function (e) {
+    $(document).on('submit', '#memberEdit-form', function (e) {
         e.preventDefault();
 
         var formData = new FormData(this);
@@ -96,7 +105,7 @@ $(document).ready(function () {
 
         $.ajax({
             type: "POST",
-            url: "routes/author.php",
+            url: "routes/masters/member.php",
             data: formData,
             contentType: false,
             processData: false,
@@ -110,7 +119,7 @@ $(document).ready(function () {
                         confirmButtonText: "OK",
                     }).then(() => {
                         table.ajax.reload();
-                        $('#editAuthorModal').modal('hide');
+                        $('#editMemberModal').modal('hide');
                     });
                 }else if(response.status === 403){
                     Swal.fire({
@@ -132,13 +141,13 @@ $(document).ready(function () {
         
     });
 
-    $('#authorsTable').on('click', '.delete-btn', function(){
-        var authorId = $(this).data('id');
-        var name = $(this).data('name');
+    $('#librariansTable').on('click', '.delete-btn', function(){
+        var userId = $(this).data('id');
+        var username = $(this).data('username');
 
         Swal.fire({
-            title: "Are you sure delete "+ name +"?",
-            text: "You won't be able to revert this! Also Books Corresponding to this Author will be Deleted!",
+            title: "Are you sure delete "+ username +"?",
+            text: "You won't be able to revert this!",
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#d33",
@@ -148,16 +157,16 @@ $(document).ready(function () {
             if (result.isConfirmed) {
                 $.ajax({
                     type: "POST",
-                    url: "routes/author.php",
+                    url: "routes/masters/librarian.php",
                     data: {
                         action: 'delete',
-                        authorId: authorId
+                        userId: userId
                     },
                     success: function (response) {
                         if (response.status === 200) {
                             Swal.fire(
                                 "Deleted!",
-                                name + " has been deleted.",
+                                username + " has been deleted.",
                                 "success"
                             );
                             table.draw();
@@ -172,7 +181,7 @@ $(document).ready(function () {
                     error: function() {
                         Swal.fire(
                             "Error!",
-                            "Failed to delete "+name,
+                            "Failed to delete "+username,
                             "error"
                         );
                     }

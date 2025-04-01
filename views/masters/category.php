@@ -71,4 +71,4 @@
   </div>
 </div>
 
-<script src="js/actions/category.js"></script>
+<script src="js/actions/masters/category.js"></script>

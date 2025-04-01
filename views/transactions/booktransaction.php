@@ -2,8 +2,8 @@
     <div class="card-header bg-success text-white text-center fs-4">
         Book Transaction
     </div>
-    <div class="card-body">
-        <form action="">
+    <form action="">
+        <div class="card-body">
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
@@ -18,6 +18,10 @@
                     </div>
                 </div>
             </div>
-        </form>
-    </div>
+        </div>
+        <div class="card-footer d-flex justify-content-end">
+            <button type="button" class="btn btn-success btn-sm" id="add-transaction-grid">Add</button>
+        </div>
+    </form>
 </div>
+<script src="js/actions/transaction/booktransaction.js"></script>

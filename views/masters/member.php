@@ -110,4 +110,4 @@
   </div>
 </div>
 
-<script src="js/actions/member.js"></script>
+<script src="js/actions/masters/member.js"></script>

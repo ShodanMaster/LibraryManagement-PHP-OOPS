@@ -71,4 +71,4 @@
   </div>
 </div>
 
-<script src="js/actions/author.js"></script>
+<script src="js/actions/masters/author.js"></script>

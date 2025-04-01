@@ -1,6 +1,6 @@
 <?php
 
-require_once("../controllers/Masters/AuthorController.php");
+require_once("../../controllers/Masters/AuthorController.php");
 $author = new AuthorController();
 
 $action = $_REQUEST['action'] ??'';

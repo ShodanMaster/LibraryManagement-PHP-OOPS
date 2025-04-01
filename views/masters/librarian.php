@@ -113,4 +113,4 @@
   </div>
 </div>
 
-<script src="js/actions/librarian.js"></script>
+<script src="js/actions/masters/librarian.js"></script>

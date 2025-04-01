@@ -1,6 +1,6 @@
 <?php
 // session_start();
-require_once("../config/Dbconfig.php");
+require_once("../../config/Dbconfig.php");
 
 class Book extends Dbconfig{
 
@@ -43,7 +43,7 @@ class Book extends Dbconfig{
                 $filterQuery .= " AND (books.serial_no LIKE ? OR books.title LIKE ? OR authors.name LIKE ? OR categories.name LIKE ?)";
                 $searchValue = "%$searchValue%";
                 $params = [$searchValue, $searchValue, $searchValue, $searchValue];
-                $types = "sss";
+                $types = "ssss";
             }
     
             $stmt = $conn->prepare($filterQuery);

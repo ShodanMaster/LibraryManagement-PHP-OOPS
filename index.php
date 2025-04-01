@@ -42,10 +42,10 @@ $act = isset($_GET["act"]) ? $_GET["act"] : "";
                     </ul>
                     </li>
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        trasnactions
+                        Trasnactions
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="index.php?act=issuebook">Issue Book</a></li>
+                        <li><a class="dropdown-item" href="index.php?act=booktransaction">Book Transaction</a></li>
                     </ul>
                     </li>
                 </ul>

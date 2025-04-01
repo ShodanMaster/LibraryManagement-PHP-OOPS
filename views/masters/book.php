@@ -89,7 +89,7 @@
   <div class="card-header bg-success text-white fs-4">
     Books Table
   </div>
-  <div class="card-body">
+  <div class="card-body table-responsive">
     <table id="booksTable" class="display">
           <thead>
               <tr>
@@ -106,4 +106,4 @@
   </div>
 </div>
 
-<script src="js/actions/book.js"></script>
+<script src="js/actions/masters/book.js"></script>

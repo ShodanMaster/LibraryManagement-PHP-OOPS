@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once("../models/Librarian.php");
+require_once("../../models/masters/Librarian.php");
 
 class LibrarianController extends Librarian{
     

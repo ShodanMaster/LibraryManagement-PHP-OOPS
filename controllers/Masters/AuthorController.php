@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once("../models/Author.php");
+require_once("../../models/masters/Author.php");
 
 class AuthorController extends Author{
     

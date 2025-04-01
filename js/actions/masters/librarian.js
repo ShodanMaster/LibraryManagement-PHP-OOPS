@@ -1,10 +1,10 @@
 $(document).ready(function () {
 
-    var table = $('#membersTable').DataTable({
+    var table = $('#librariansTable').DataTable({
         processing: true,
         serverSide: true,
         ajax: {
-            url: "routes/Member.php",
+            url: "routes/masters/librarian.php",
             type: "GET"
         },
         columns: [
@@ -14,18 +14,13 @@ $(document).ready(function () {
                     return meta.row + 1;
                 }
             },
-            { data: "serial_no" },
-            { data: "name" },
-            { data: "phone" },
-            { data: "membership_type" },
-            { data: "membership_updated" },
-            { data: "status" },
+            { data: "username" },
             { 
                 data: null,
                 render: function (data, type, row) {
                     return `
-                        <button class="btn btn-sm btn-info edit-btn"  data-bs-toggle="modal" data-bs-target="#editMemberModal" data-id="${row.id}" data-name="${row.name}" data-phone="${row.phone}" data-type="${row.membership_type}">Edit</button>
-                        <button class="btn btn-sm btn-danger delete-btn" data-id="${row.id}" data-name="${row.name}">Delete</button>
+                        <button class="btn btn-sm btn-info edit-btn"  data-bs-toggle="modal" data-bs-target="#editLibrarianModal" data-id="${row.id}" data-username="${row.username}">Edit</button>
+                        <button class="btn btn-sm btn-danger delete-btn" data-id="${row.id}" data-username="${row.username}">Delete</button>
                     `;
                 }
             }
@@ -34,12 +29,19 @@ $(document).ready(function () {
         lengthMenu: [[5, 10, 25, -1], [5, 10, 25, "All"]]
     });
 
-    $('#addMemberModal').on('hidden.bs.modal', function () {
+    $('#addLibrarianModal').on('hidden.bs.modal', function () {
         $(this).find('form')[0].reset();
     });
- 
+    
+    document.getElementById('show-password').addEventListener('change', function () {
+        let passwordFields = document.querySelectorAll('#password, #confirm-password');
+        passwordFields.forEach(field => {
+            field.type = this.checked ? 'text' : 'password';
+        });
+    });
+  
 
-    $(document).on('submit', '#member-form', function (e) {
+    $(document).on('submit', '#librarian-form', function (e) {
 
         e.preventDefault();
 
@@ -48,7 +50,7 @@ $(document).ready(function () {
 
         $.ajax({
             type: "POST",
-            url: "routes/member.php",
+            url: "routes/masters/librarian.php",
             data: formData,
             contentType: false,
             processData: false,
@@ -62,7 +64,7 @@ $(document).ready(function () {
                         confirmButtonText: "OK",
                     }).then(() => {
                         table.ajax.reload();
-                        $('#addMemberModal').modal('hide');
+                        $('#addLibrarianModal').modal('hide');
                     });
                 }else if(response.status === 403){
                     Swal.fire({
@@ -81,23 +83,46 @@ $(document).ready(function () {
                 }             
             }
         });
-    });  
+    });
 
-    $('#membersTable').on('click', '.edit-btn', function () {
         
-        var memberId = $(this).data('id');
-        var name = $(this).data('name');
-        var phone = $(this).data('phone');
-        var type = $(this).data('type');
+    document.getElementById('change-password').addEventListener('change', function () {
+        
+        let passwordFields = document.querySelectorAll('#edit-password, #edit-confirm-password, #edit-show-password');
+        passwordFields.forEach(field => {
+            field.disabled = !this.checked;
+        });
+    });
+        
+    document.getElementById('edit-show-password').addEventListener('change', function () {
+        let passwordFields = document.querySelectorAll('#edit-password, #edit-confirm-password');
+        passwordFields.forEach(field => {
+            field.type = this.checked ? 'text' : 'password';
+        });
+    });
+
     
-        $('#edit-id').val(memberId);
-        $('#edit-name').val(name);
-        $('#edit-phone').val(phone);
-        $('#edit-type').val(type);
+
+    $('#librariansTable').on('click', '.edit-btn', function () {
+        var userId = $(this).data('id');
+        var username = $(this).data('username');
+    
+        console.log(userId, username);
+    
+        $('#edit-id').val(userId);
+        $('#edit-username').val(username);
+        $('#change-password').prop('checked', false);
+        $('#edit-show-password').prop('checked', false);
+        $('#edit-password').val('').prop('disabled', true);
+        $('#edit-confirm-password').val('').prop('disabled', true);
+    
+        $('#change-password').on('change', function () {
+            $('#edit-password, #edit-confirm-password', '#edit-show-password').prop('disabled', !this.checked);
+        });
     });
     
 
-    $(document).on('submit', '#memberEdit-form', function (e) {
+    $(document).on('submit', '#librarianEdit-form', function (e) {
         e.preventDefault();
 
         var formData = new FormData(this);
@@ -105,7 +130,7 @@ $(document).ready(function () {
 
         $.ajax({
             type: "POST",
-            url: "routes/member.php",
+            url: "routes/masters/librarian.php",
             data: formData,
             contentType: false,
             processData: false,
@@ -119,7 +144,7 @@ $(document).ready(function () {
                         confirmButtonText: "OK",
                     }).then(() => {
                         table.ajax.reload();
-                        $('#editMemberModal').modal('hide');
+                        $('#editLibrarianModal').modal('hide');
                     });
                 }else if(response.status === 403){
                     Swal.fire({
@@ -157,7 +182,7 @@ $(document).ready(function () {
             if (result.isConfirmed) {
                 $.ajax({
                     type: "POST",
-                    url: "routes/librarian.php",
+                    url: "routes/masters/librarian.php",
                     data: {
                         action: 'delete',
                         userId: userId

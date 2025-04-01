@@ -1,10 +1,10 @@
 $(document).ready(function () {
 
-    var table = $('#booksTable').DataTable({
+    var table = $('#categoriesTable').DataTable({
         processing: true,
         serverSide: true,
         ajax: {
-            url: "routes/book.php",
+            url: "routes/masters/category.php",
             type: "GET"
         },
         columns: [
@@ -14,16 +14,13 @@ $(document).ready(function () {
                     return meta.row + 1;
                 }
             },
-            { data: "serial_no" },
-            { data: "category" },
-            { data: "title" },
-            { data: "author" },
+            { data: "name" },
             { 
                 data: null,
                 render: function (data, type, row) {
                     return `
-                        <button class="btn btn-sm btn-info edit-btn" data-bs-toggle="modal" data-bs-target="#editBookModal" data-id="${row.id}" data-author="${row.author}" data-category="${row.category}" data-title="${row.title}">Edit</button>
-                        <button class="btn btn-sm btn-danger delete-btn" data-id="${row.id}" data-name="${row.title}">Delete</button>
+                        <button class="btn btn-sm btn-info edit-btn"  data-bs-toggle="modal" data-bs-target="#editCategoryModal" data-id="${row.id}" data-name="${row.name}">Edit</button>
+                        <button class="btn btn-sm btn-danger delete-btn" data-id="${row.id}" data-name="${row.name}">Delete</button>
                     `;
                 }
             }
@@ -32,53 +29,12 @@ $(document).ready(function () {
         lengthMenu: [[5, 10, 25, -1], [5, 10, 25, "All"]]
     });
 
-    $.ajax({
-        url: "routes/author.php",
-        type: "GET",
-        dataType: "json",
-        success: function (response) {
-            let authorSelect = $("#author, #edit-author");
-            authorSelect.empty();
-    
-            authorSelect.append('<option value="" disabled selected>--Select Author--</option>');
-    
-            $.each(response.data, function (key, author) {
-                authorSelect.append(
-                    `<option value="${author.name}">${author.name}</option>`
-                );
-            });
-        },
-        error: function () {
-            alert("Failed to load authors.");
-        }
-    });    
-
-    $.ajax({
-        url: "routes/category.php",
-        type: "GET",
-        dataType: "json",
-        success: function (response) {
-            let categorySelect = $("#category, #edit-category");
-            categorySelect.empty();
-    
-            categorySelect.append('<option value="" disabled selected>--Select Category--</option>');
-    
-            $.each(response.data, function (key, category) {
-                categorySelect.append(
-                    `<option value="${category.name}">${category.name}</option>`
-                );
-            });
-        },
-        error: function () {
-            alert("Failed to load categories.");
-        }
-    });    
-
-    $('#addBookModal').on('shown.bs.modal', function () {
+    $('#addCategoryModal').on('hidden.bs.modal', function () {
         $(this).find('form')[0].reset();
     });
+ 
 
-    $(document).on('submit', '#book-form', function (e) {
+    $(document).on('submit', '#category-form', function (e) {
 
         e.preventDefault();
 
@@ -87,7 +43,7 @@ $(document).ready(function () {
 
         $.ajax({
             type: "POST",
-            url: "routes/book.php",
+            url: "routes/masters/category.php",
             data: formData,
             contentType: false,
             processData: false,
@@ -101,7 +57,7 @@ $(document).ready(function () {
                         confirmButtonText: "OK",
                     }).then(() => {
                         table.ajax.reload();
-                        $('#addBookModal').modal('hide');
+                        $('#addCategoryModal').modal('hide');
                     });
                 }else if(response.status === 403){
                     Swal.fire({
@@ -122,21 +78,17 @@ $(document).ready(function () {
         });
     });  
 
-    $('#booksTable').on('click', '.edit-btn', function () {
+    $('#categoriesTable').on('click', '.edit-btn', function () {
         
-        var bookId = $(this).data('id');
-        var category = $(this).data('category');
-        var author = $(this).data('author');
-        var title = $(this).data('title');
+        var categoryId = $(this).data('id');
+        var name = $(this).data('name');
     
-        $('#edit-id').val(bookId);
-        $('#edit-title').val(title);
-        $('#edit-category').val(category);
-        $('#edit-author').val(author);
+        $('#edit-id').val(categoryId);
+        $('#edit-name').val(name);
     });
     
 
-    $(document).on('submit', '#bookEdit-form', function (e) {
+    $(document).on('submit', '#categoryEdit-form', function (e) {
         e.preventDefault();
 
         var formData = new FormData(this);
@@ -144,7 +96,7 @@ $(document).ready(function () {
 
         $.ajax({
             type: "POST",
-            url: "routes/book.php",
+            url: "routes/masters/category.php",
             data: formData,
             contentType: false,
             processData: false,
@@ -158,7 +110,7 @@ $(document).ready(function () {
                         confirmButtonText: "OK",
                     }).then(() => {
                         table.ajax.reload();
-                        $('#editBookModal').modal('hide');
+                        $('#editCategoryModal').modal('hide');
                     });
                 }else if(response.status === 403){
                     Swal.fire({
@@ -180,13 +132,13 @@ $(document).ready(function () {
         
     });
 
-    $('#booksTable').on('click', '.delete-btn', function(){
-        var bookId = $(this).data('id');
+    $('#categoriesTable').on('click', '.delete-btn', function(){
+        var categoryId = $(this).data('id');
         var name = $(this).data('name');
 
         Swal.fire({
             title: "Are you sure delete "+ name +"?",
-            text: "You won't be able to revert this! Also Books Corresponding to this Book will be Deleted!",
+            text: "You won't be able to revert this! Also Books Corresponding to this Category will be Deleted!",
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#d33",
@@ -196,10 +148,10 @@ $(document).ready(function () {
             if (result.isConfirmed) {
                 $.ajax({
                     type: "POST",
-                    url: "routes/book.php",
+                    url: "routes/masters/category.php",
                     data: {
                         action: 'delete',
-                        bookId: bookId
+                        categoryId: categoryId
                     },
                     success: function (response) {
                         if (response.status === 200) {

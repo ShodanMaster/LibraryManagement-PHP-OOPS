@@ -1,10 +1,10 @@
 $(document).ready(function () {
 
-    var table = $('#librariansTable').DataTable({
+    var table = $('#authorsTable').DataTable({
         processing: true,
         serverSide: true,
         ajax: {
-            url: "routes/librarian.php",
+            url: "routes/masters/author.php",
             type: "GET"
         },
         columns: [
@@ -14,13 +14,13 @@ $(document).ready(function () {
                     return meta.row + 1;
                 }
             },
-            { data: "username" },
+            { data: "name" },
             { 
                 data: null,
                 render: function (data, type, row) {
                     return `
-                        <button class="btn btn-sm btn-info edit-btn"  data-bs-toggle="modal" data-bs-target="#editLibrarianModal" data-id="${row.id}" data-username="${row.username}">Edit</button>
-                        <button class="btn btn-sm btn-danger delete-btn" data-id="${row.id}" data-username="${row.username}">Delete</button>
+                        <button class="btn btn-sm btn-info edit-btn"  data-bs-toggle="modal" data-bs-target="#editAuthorModal" data-id="${row.id}" data-name="${row.name}">Edit</button>
+                        <button class="btn btn-sm btn-danger delete-btn" data-id="${row.id}" data-name="${row.name}">Delete</button>
                     `;
                 }
             }
@@ -29,19 +29,12 @@ $(document).ready(function () {
         lengthMenu: [[5, 10, 25, -1], [5, 10, 25, "All"]]
     });
 
-    $('#addLibrarianModal').on('hidden.bs.modal', function () {
+    $('#addAuthorModal').on('hidden.bs.modal', function () {
         $(this).find('form')[0].reset();
     });
-    
-    document.getElementById('show-password').addEventListener('change', function () {
-        let passwordFields = document.querySelectorAll('#password, #confirm-password');
-        passwordFields.forEach(field => {
-            field.type = this.checked ? 'text' : 'password';
-        });
-    });
-  
+ 
 
-    $(document).on('submit', '#librarian-form', function (e) {
+    $(document).on('submit', '#author-form', function (e) {
 
         e.preventDefault();
 
@@ -50,7 +43,7 @@ $(document).ready(function () {
 
         $.ajax({
             type: "POST",
-            url: "routes/librarian.php",
+            url: "routes/masters/author.php",
             data: formData,
             contentType: false,
             processData: false,
@@ -64,7 +57,7 @@ $(document).ready(function () {
                         confirmButtonText: "OK",
                     }).then(() => {
                         table.ajax.reload();
-                        $('#addLibrarianModal').modal('hide');
+                        $('#addAuthorModal').modal('hide');
                     });
                 }else if(response.status === 403){
                     Swal.fire({
@@ -83,46 +76,19 @@ $(document).ready(function () {
                 }             
             }
         });
-    });
+    });  
 
+    $('#authorsTable').on('click', '.edit-btn', function () {
         
-    document.getElementById('change-password').addEventListener('change', function () {
-        
-        let passwordFields = document.querySelectorAll('#edit-password, #edit-confirm-password, #edit-show-password');
-        passwordFields.forEach(field => {
-            field.disabled = !this.checked;
-        });
-    });
-        
-    document.getElementById('edit-show-password').addEventListener('change', function () {
-        let passwordFields = document.querySelectorAll('#edit-password, #edit-confirm-password');
-        passwordFields.forEach(field => {
-            field.type = this.checked ? 'text' : 'password';
-        });
-    });
-
+        var authorId = $(this).data('id');
+        var name = $(this).data('name');
     
-
-    $('#librariansTable').on('click', '.edit-btn', function () {
-        var userId = $(this).data('id');
-        var username = $(this).data('username');
-    
-        console.log(userId, username);
-    
-        $('#edit-id').val(userId);
-        $('#edit-username').val(username);
-        $('#change-password').prop('checked', false);
-        $('#edit-show-password').prop('checked', false);
-        $('#edit-password').val('').prop('disabled', true);
-        $('#edit-confirm-password').val('').prop('disabled', true);
-    
-        $('#change-password').on('change', function () {
-            $('#edit-password, #edit-confirm-password', '#edit-show-password').prop('disabled', !this.checked);
-        });
+        $('#edit-id').val(authorId);
+        $('#edit-name').val(name);
     });
     
 
-    $(document).on('submit', '#librarianEdit-form', function (e) {
+    $(document).on('submit', '#authorEdit-form', function (e) {
         e.preventDefault();
 
         var formData = new FormData(this);
@@ -130,7 +96,7 @@ $(document).ready(function () {
 
         $.ajax({
             type: "POST",
-            url: "routes/librarian.php",
+            url: "routes/masters/author.php",
             data: formData,
             contentType: false,
             processData: false,
@@ -144,7 +110,7 @@ $(document).ready(function () {
                         confirmButtonText: "OK",
                     }).then(() => {
                         table.ajax.reload();
-                        $('#editLibrarianModal').modal('hide');
+                        $('#editAuthorModal').modal('hide');
                     });
                 }else if(response.status === 403){
                     Swal.fire({
@@ -166,13 +132,13 @@ $(document).ready(function () {
         
     });
 
-    $('#librariansTable').on('click', '.delete-btn', function(){
-        var userId = $(this).data('id');
-        var username = $(this).data('username');
+    $('#authorsTable').on('click', '.delete-btn', function(){
+        var authorId = $(this).data('id');
+        var name = $(this).data('name');
 
         Swal.fire({
-            title: "Are you sure delete "+ username +"?",
-            text: "You won't be able to revert this!",
+            title: "Are you sure delete "+ name +"?",
+            text: "You won't be able to revert this! Also Books Corresponding to this Author will be Deleted!",
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#d33",
@@ -182,16 +148,16 @@ $(document).ready(function () {
             if (result.isConfirmed) {
                 $.ajax({
                     type: "POST",
-                    url: "routes/librarian.php",
+                    url: "routes/masters/author.php",
                     data: {
                         action: 'delete',
-                        userId: userId
+                        authorId: authorId
                     },
                     success: function (response) {
                         if (response.status === 200) {
                             Swal.fire(
                                 "Deleted!",
-                                username + " has been deleted.",
+                                name + " has been deleted.",
                                 "success"
                             );
                             table.draw();
@@ -206,7 +172,7 @@ $(document).ready(function () {
                     error: function() {
                         Swal.fire(
                             "Error!",
-                            "Failed to delete "+username,
+                            "Failed to delete "+name,
                             "error"
                         );
                     }

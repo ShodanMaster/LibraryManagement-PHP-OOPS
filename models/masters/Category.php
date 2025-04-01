@@ -1,8 +1,8 @@
 <?php
 // session_start();
-require_once("../config/Dbconfig.php");
+require_once("../../config/Dbconfig.php");
 
-class Member extends Dbconfig{
+class Category extends Dbconfig{
 
     public function __construct(){
         if(isset($_SESSION["role"]) && !$_SESSION["role"] === "admin"){
@@ -10,7 +10,7 @@ class Member extends Dbconfig{
         }
     }
 
-    protected function membersGet() {
+    protected function categoriesGet() {
         try {
             $conn = $this->connect();
     
@@ -18,25 +18,25 @@ class Member extends Dbconfig{
             $start = $_GET['start'] ?? 0;
             $length = $_GET['length'] ?? 10;
             $searchValue = $_GET['search']['value'] ?? '';
-    
-            $stmt = $conn->prepare("SELECT COUNT(*) as count FROM members");
+            
+            $stmt = $conn->prepare("SELECT COUNT(*) as count FROM categories");
             $stmt->execute();
             $totalRecords = $stmt->get_result()->fetch_assoc()['count'];
-    
-            $query = "SELECT id, serial_no, name, phone, membership_type, membership_updated, status FROM members WHERE 1";
+            
+            $query = "SELECT id, name FROM categories WHERE 1";
             $params = [];
             $types = '';
     
             if (!empty($searchValue)) {
-                $query .= " AND (serial_no LIKE ? OR name LIKE ? OR phone LIKE ? OR membership_type LIKE ? OR status LIKE ?)";
+                $query .= " AND (name LIKE ?)";
                 $searchValue = "%$searchValue%";
-                $params = [$searchValue, $searchValue, $searchValue, $searchValue, $searchValue];
-                $types = "sssss";
+                $params = [$searchValue];
+                $types = "s";
             }
-    
-            $filterQuery = "SELECT COUNT(*) as count FROM members WHERE 1";
+            
+            $filterQuery = "SELECT COUNT(*) as count FROM categories WHERE 1";
             if (!empty($searchValue)) {
-                $filterQuery .= " AND (serial_no LIKE ? OR name LIKE ? OR phone LIKE ? OR membership_type LIKE ? OR status LIKE ?)";
+                $filterQuery .= " AND (name LIKE ?)";
             }
     
             $stmt = $conn->prepare($filterQuery);
@@ -45,22 +45,22 @@ class Member extends Dbconfig{
             }
             $stmt->execute();
             $recordsFiltered = $stmt->get_result()->fetch_assoc()['count'];
-    
+            
             $query .= " ORDER BY id DESC LIMIT ?, ?";
             $params[] = (int)$start;
             $params[] = (int)$length;
             $types .= "ii";
-    
+            
             $stmt = $conn->prepare($query);
             $stmt->bind_param($types, ...$params);
             $stmt->execute();
             $result = $stmt->get_result();
-    
+            
             $data = [];
             while ($row = $result->fetch_assoc()) {
                 $data[] = $row;
             }
-    
+            
             return json_encode([
                 "draw" => intval($draw),
                 "recordsTotal" => $totalRecords,
@@ -77,9 +77,9 @@ class Member extends Dbconfig{
                 "error" => $e->getMessage()
             ]);
         }
-    }    
+    }        
 
-    protected function memberCreate($name, $phone, $type){
+    protected function categoryCreate($name){
         // echo $username;exit;
         try{
             $conn = $this->connect();
@@ -88,87 +88,92 @@ class Member extends Dbconfig{
     
             $srlno = $this->makeSerialNo();
 
-            $query = "INSERT INTO members (serial_no, name, phone, membership_type) VALUES (?, ?, ?, ?)";
+            $query = "INSERT INTO categories (name) VALUES (?)";
             // echo $query;exit;
             $stmt = $conn->prepare($query);
             
-            $stmt->bind_param("ssss", $srlno, $name, $phone, $type);
+            $stmt->bind_param("s",$name);
 
             if ($stmt->execute()) {
                 $conn->commit();
-                return ["status" => 200, "message" => "Member Created successful!"];
+                return ["status" => 200, "message" => "Category Created successful!"];
             } else {
                 $conn->rollback();
-                return ["status" => 500, "message" => "Member Create failed!"];
+                return ["status" => 500, "message" => "Category Create failed!"];
             }
         } catch (mysqli_sql_exception $e) {
             $conn->rollback();
-            if (strpos($e->getMessage(), 'Duplicate entry') !== false && strpos($e->getMessage(), 'for key \'phone\'') !== false) {
-                return ["status" => 409, "message" => "Phone number already exists!"];
+            if (strpos($e->getMessage(), 'Duplicate entry') !== false && strpos($e->getMessage(), 'for key \'name\'') !== false) {
+                return ["status" => 409, "message" => "Category already exists!"];
             }
             return ["status" => 500, "message" => "Database error: " . $e->getMessage()];
         }        
         
     }
 
-    protected function memberUpdate($id, $name, $phone, $type) {
+    protected function categoryUpdate($id, $name) {
         try {
             $conn = $this->connect();
             $conn->begin_transaction();
     
-            $query = "SELECT id FROM members WHERE id = ?";
+            $query = "SELECT id FROM categories WHERE id = ?";
             $stmt = $conn->prepare($query);
             $stmt->bind_param("i", $id);
             $stmt->execute();
             $result = $stmt->get_result();
     
             if ($result->num_rows === 0) {
-                return ["status" => 404, "message" => "Member Not Found"];
+                return ["status" => 404, "message" => "Category Not Found"];
             }
             
-            $sql = "UPDATE members SET name = ?, phone = ?, membership_type = ? WHERE id = ?";
+            $sql = "UPDATE categories SET name = ? WHERE id = ?";
             $stmt = $conn->prepare($sql);
-            $stmt->bind_param("sssi", $name, $phone, $type, $id);
+            $stmt->bind_param("si", $name, $id);
     
             if ($stmt->execute()) {
                 $conn->commit();
                 return [
                     'status' => 200,
-                    'message' =>'Member Updated Successfully'
+                    'message' =>'Category Updated Successfully'
                 ];
             }
     
         } catch (mysqli_sql_exception $e) {
             $conn->rollback();
-            if (strpos($e->getMessage(), 'Duplicate entry') !== false && strpos($e->getMessage(), 'for key \'phone\'') !== false) {
-                return ["status" => 409, "message" => "Phone number already exists!"];
+            if (strpos($e->getMessage(), 'Duplicate entry') !== false && strpos($e->getMessage(), 'for key \'name\'') !== false) {
+                return ["status" => 409, "message" => "Name already exists!"];
             }
             return ["status" => 500, "message" => "Database error: " . $e->getMessage()];
         }
     }
     
-    public function librarianDelete($id){
+    public function categoryDelete($id){
         try{
             $conn = $this->connect();
             $conn->begin_transaction();
 
-            $sql = "SELECT id FROM users WHERE id = ?";
+            $sql = "SELECT id FROM categories WHERE id = ?";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("i", $id);
             $stmt->execute();
             $result = $stmt->get_result();
 
             if ($result->num_rows > 0) {
-                $sql = 'DELETE FROM users WHERE id = ?';
+                $sql = "DELETE FROM books WHERE category_id = ?";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("i", $id);
+                $stmt->execute();
+                
+                $sql = 'DELETE FROM categories WHERE id = ?';
                 $stmt = $conn->prepare($sql);
                 $stmt->bind_param('i', $id);
 
                 if ($stmt->execute()) {
                     $conn->commit();
-                    return ['status' => 200, 'message' => 'User Deleted Successfully'];
+                    return ['status' => 200, 'message' => 'Category and related books deleted successfully'];
                 } else {
                     $conn->rollback();
-                    return ["status" => 500, "message" => "User Delete Failed"];
+                    return ["status" => 500, "message" => "Category Delete Failed"];
                 }
             }
 

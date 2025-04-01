@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once("../models/Member.php");
+require_once("../../models/masters/Member.php");
 
 class MemberController extends Member{
     

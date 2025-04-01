@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once("../models/Category.php");
+require_once("../../models/masters/Category.php");
 
 class CategoryController extends Category{
     

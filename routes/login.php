@@ -1,6 +1,6 @@
 <?php
 
-require_once("../controllers/Masters/LoginController.php");
+require_once("../controllers/LoginController.php");
 $authenticate = new LoginController();
 
 $action = $_REQUEST['action'] ??'';

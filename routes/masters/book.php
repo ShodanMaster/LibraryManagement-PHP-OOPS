@@ -1,14 +1,14 @@
 <?php
 
-require_once("../controllers/Masters/LibrarianController.php");
-$librarian = new LibrarianController();
+require_once("../../controllers/Masters/BookController.php");
+$book = new BookController();
 
 $action = $_REQUEST['action'] ??'';
 
 header('Content-Type: application/json');
 
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
-    $response = $librarian->getLibrarians();
+    $response = $book->getbooks();
 
     if (!json_decode($response, true)) {
         echo json_encode(["status" => 500, "message" => "Invalid JSON response", "debug" => $response]);
@@ -23,19 +23,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     if($action == 'add'){
         // print_r($_POST);exit;
-        $response = $librarian->createLibrarian($_POST);
+        $response = $book->createBook($_POST);
         echo $response;
     }
     
     if ($action == 'edit') {
         // print_r($_POST);exit;
-        $response = $librarian->updateLibrarian($_POST);
+        $response = $book->updateBook($_POST);
         echo $response;
     }
     
     if($action == 'delete'){
         // print_r($_POST);exit;
-        $response = $librarian->deleteLibrarian($_POST);
+        $response = $book->deleteBook($_POST);
         echo $response;
     }
 }
