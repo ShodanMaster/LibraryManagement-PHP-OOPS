@@ -15,7 +15,7 @@ $(document).ready(function () {
 
         $.ajax({
             type: "POST",
-            url: "routes/transactions/fetchBook.php",
+            url: "routes/transactions/booktransaction.php",
             data: formData,
             contentType: false,
             processData: false,

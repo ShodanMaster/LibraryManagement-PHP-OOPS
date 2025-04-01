@@ -5,8 +5,23 @@ $bookTransaction = new BookTransactionController();
 
 $action = $_REQUEST['action'] ?? '';
 
-if ($action == 'bookTransaction') {
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
-   $response =  $bookTransaction->saveTransaction($_POST);
-   echo $response;
+    if ($action == 'bookTransaction') {
+        
+       $response =  $bookTransaction->saveTransaction($_POST);
+       echo $response;
+    }
+    
+    
+    if ($action == 'fetchData') {
+        $member = $_POST['member'] ?? '';
+        $book = $_POST['book'] ?? '';
+    
+    
+        $dataResponse = $bookTransaction->fetchData($member, $book);
+    
+        echo $dataResponse;
+    
+    }
 }

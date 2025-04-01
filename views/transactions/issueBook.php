@@ -1,6 +1,6 @@
 <div class="card shadow-lg">
     <div class="card-header bg-success text-white text-center fs-4">
-        Book Transaction
+        Issue Book
     </div>
     <form id="add-form">
         <div class="card-body">
