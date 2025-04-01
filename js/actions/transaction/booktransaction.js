@@ -20,30 +20,30 @@ $(document).ready(function () {
             contentType: false,
             processData: false,
             success: function (response) {
-                console.log(response);
-                
+                console.log('Raw Response:', response); // Log raw response to debug
+        
                 try {
                     let data = JSON.parse(response);
-                    console.log('Response:', data);
-
+                    console.log('Parsed Response:', data);
+        
                     if (data.status === 200) {
                         // Set member details
                         document.getElementById('memberName').value = data.member.name;
                         document.getElementById('memberId').value = data.member.id;
                         document.getElementById('memberSerialNo').value = member;
-
+        
                         // Add book ID to the array if not already added
                         if (!bookIdArray.includes(data.book.id)) {
                             bookIdArray.push(data.book.id);
                             document.getElementById('bookIds').value = JSON.stringify(bookIdArray);
-
+        
                             // Append book to the table
                             let tableBody = document.querySelector('#bookTable tbody');
                             let newRow = `<tr id="row-${data.book.id}">
                                             <td>${bookIdArray.length}</td>
                                             <td>${data.book.title}</td>
                                             <td><button type="button" class="btn btn-danger btn-sm remove-book" data-id="${data.book.id}">Remove</button></td>
-                                        </tr>`;
+                                          </tr>`;
                             tableBody.insertAdjacentHTML('beforeend', newRow);
                         } else {
                             Swal.fire({
@@ -52,6 +52,13 @@ $(document).ready(function () {
                                 text: "This book has already been added."
                             });
                         }
+                    } else if (data.status === 400) {
+                        // Handle the case when the book is already issued
+                        Swal.fire({
+                            icon: "warning",
+                            title: "Book Already Issued",
+                            text: data.message // The message will be something like "The Vishnu book is already issued."
+                        });
                     } else {
                         Swal.fire({
                             icon: "error",
@@ -60,11 +67,22 @@ $(document).ready(function () {
                         });
                     }
                 } catch (error) {
+                    console.log('Response: '+response);
+                     
+                    if(response.status===400){
+                        Swal.fire({
+                            icon: "warning",
+                            title: "Book Already Issued",
+                            text: response.message // Log raw response here for debugging
+                        });
+                    }
+
                     Swal.fire({
                         icon: "error",
                         title: "JSON Parse Error",
-                        text: "Failed to parse server response."
+                        text: "Failed to parse server response. Raw response: " + response // Log raw response here for debugging
                     });
+                    console.log('Error:', error); // Log error for debugging
                 }
             },
             error: function () {
@@ -75,6 +93,8 @@ $(document).ready(function () {
                 });
             }
         });
+         
+        
     });
 
     // Handle Book Removal
