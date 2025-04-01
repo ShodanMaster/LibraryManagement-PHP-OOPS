@@ -1,6 +1,6 @@
 <?php
 
-require_once("../controllers/CategoryController.php");
+require_once("../controllers/Masters/CategoryController.php");
 $category = new CategoryController();
 
 $action = $_REQUEST['action'] ??'';

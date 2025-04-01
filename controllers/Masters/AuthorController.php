@@ -71,8 +71,8 @@ class AuthorController extends Author{
             return ["status" => 400, "message" => "Name Type are required!"];
         }
     
-        if (!preg_match('/^[a-zA-Z\s]{3,20}$/', $name)) {
-            return ["status" => 400, "message" => "Name must be 3-20 characters long and contain only letters and spaces!"];
+        if (!preg_match('/^[a-zA-Z\s]{3,150}$/', $name)) {
+            return ["status" => 400, "message" => "Name must be 3-150 characters long and contain only letters and spaces!"];
         }
     
         return ["status" => 200, "message" => "Validation passed!"];

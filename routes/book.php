@@ -1,6 +1,6 @@
 <?php
 
-require_once("../controllers/BookController.php");
+require_once("../controllers/Masters/BookController.php");
 $book = new BookController();
 
 $action = $_REQUEST['action'] ??'';

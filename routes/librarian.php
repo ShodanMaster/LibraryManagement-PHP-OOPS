@@ -1,6 +1,6 @@
 <?php
 
-require_once("../controllers/LibrarianController.php");
+require_once("../controllers/Masters/LibrarianController.php");
 $librarian = new LibrarianController();
 
 $action = $_REQUEST['action'] ??'';

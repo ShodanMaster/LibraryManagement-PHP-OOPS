@@ -90,21 +90,23 @@
     Members Table
   </div>
   <div class="card-body">
-    <table id="membersTable" class="display">
-          <thead>
-              <tr>
-                  <th>#</th>
-                  <th>Serial No</th>
-                  <th>Name</th>
-                  <th>Phone</th>
-                  <th>Membertship Type</th>
-                  <th>Membership Updated</th>
-                  <th>Status</th>
-                  <th>Action</th>
-              </tr>
-          </thead>
-          <tbody></tbody>
+    <div class="table-responsive">
+      <table id="membersTable" class="display">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Serial No</th>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Membertship Type</th>
+                    <th>Membership Updated</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
       </table>
+    </div>
   </div>
 </div>
 

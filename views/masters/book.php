@@ -10,7 +10,7 @@
         <div class="modal-body">
             <div class="row">
                 <div class="col-md-6">
-                    <div class="form-group">
+                    <div class="form-group mb-2">
                         <select class="form-control" name="category" id="category">
                             <option value="" disabled selected>--Select Category--</option>
                         </select>
@@ -50,7 +50,7 @@
           <div class="modal-body">
             <div class="row">
                 <div class="col-md-6">
-                    <div class="form-group">
+                    <div class="form-group mb-2">
                         <select class="form-control" name="category" id="edit-category">
                             <option value="" disabled selected>--Select Category--</option>
                         </select>

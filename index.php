@@ -41,8 +41,12 @@ $act = isset($_GET["act"]) ? $_GET["act"] : "";
                         <li><a class="dropdown-item" href="index.php?act=book">Book Master</a></li>
                     </ul>
                     </li>
-                    <li class="nav-item">
-                    <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        trasnactions
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="index.php?act=issuebook">Issue Book</a></li>
+                    </ul>
                     </li>
                 </ul>
                 <form class="d-flex" action="routes/login.php?action=logout" method="POST">
@@ -55,6 +59,7 @@ $act = isset($_GET["act"]) ? $_GET["act"] : "";
     <?php 
 
         switch ($act) {
+            //master
             case "":
                     echo "<h1>Library Management</h1>";
                     break;
@@ -72,6 +77,11 @@ $act = isset($_GET["act"]) ? $_GET["act"] : "";
                 break;
             case "book": 
                 include "views/masters/book.php";
+                break;
+
+            //transactions
+            case "booktransaction":
+                include "views/transactions/booktransaction.php";
                 break;
         }
 

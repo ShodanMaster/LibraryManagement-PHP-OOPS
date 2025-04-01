@@ -1,6 +1,6 @@
 <?php
 
-require_once("../controllers/MemberController.php");
+require_once("../controllers/Masters/MemberController.php");
 $member = new MemberController();
 
 $action = $_REQUEST['action'] ??'';
