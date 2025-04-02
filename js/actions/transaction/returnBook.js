@@ -11,7 +11,7 @@ $(document).ready(function () {
             data: formData,
             contentType: false,
             processData: false,
-            success: function (response) {
+            success: function (response) {                
                 $('#returnBooksCard').show();
                 $('#bookTable').show();
                 try {
@@ -20,11 +20,14 @@ $(document).ready(function () {
                         let books = data.data;
                         let tableBody = document.querySelector('#bookTable tbody');
                         tableBody.innerHTML = "";
-
+            
                         books.forEach((book, index) => {
-                            let newRow = `<tr id="row-${book.bookSNO}">
+                            let dueClass = book.isDue === "Yes" ? "table-danger" : "";
+                            let dueMessage = book.isDue === "Yes" ? `<span class="text-danger">This book is overdue!</span>` : "";
+                            
+                            let newRow = `<tr id="row-${book.bookSNO}" class="${dueClass}">
                                             <td>${index + 1}</td>
-                                            <td>${book.bookTitle}</td>
+                                            <td>${book.bookTitle} ${dueMessage}</td>
                                           </tr>`;
                             tableBody.insertAdjacentHTML('beforeend', newRow);
                         });
@@ -42,7 +45,7 @@ $(document).ready(function () {
                         text: "Failed to parse server response."
                     });
                 }
-            },
+            },            
             error: function () {
                 Swal.fire({
                     icon: "error",

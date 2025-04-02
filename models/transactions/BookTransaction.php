@@ -131,20 +131,26 @@ class BookTransaction extends Dbconfig {
                 $bookSql = "SELECT 
                                 books.id AS bookID, 
                                 books.title AS bookTitle, 
-                                books.serial_no AS bookSNO 
+                                books.serial_no AS bookSNO,
+                                booktransactions.due_date,
+                                CASE 
+                                    WHEN booktransactions.due_date < CURDATE() THEN 'Yes' 
+                                    ELSE 'No' 
+                                END AS isDue
                             FROM booktransactions 
                             JOIN books ON booktransactions.book_id = books.id 
                             WHERE booktransactions.member_id = ? 
                             AND booktransactions.status = 'issued'";
-                $stmt = $conn->prepare($bookSql);
-                $stmt->bind_param("i", $row['id']);
-                $stmt->execute();
-                $result = $stmt->get_result();
 
-                $books = [];
-                while ($row = $result->fetch_assoc()) {
-                    $books[] = $row;
-                }
+            $stmt = $conn->prepare($bookSql);
+            $stmt->bind_param("i", $row['id']);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            $books = [];
+            while ($row = $result->fetch_assoc()) {
+                $books[] = $row;
+            }
 
                 if (!empty($books)) {
                     return ['status' => 200, 'message' => 'Books Found', 'data' => $books];
@@ -166,6 +172,12 @@ class BookTransaction extends Dbconfig {
 
             if($validateMemberBook['status'] !== 200){
                 return $validateMemberBook;
+            }
+
+            $validateDueDate = $this->validateDueDate($bookSerialNo);
+
+            if($validateDueDate['status'] !== 200){
+                return $validateDueDate;
             }
 
             $conn = $this->connect();
@@ -224,7 +236,42 @@ class BookTransaction extends Dbconfig {
         }
     
         return ['status' => 200, 'message' => 'Membership Valid'];
-    } 
+    }
+    
+    private function validateDueDate($bookSerialNo) {
+        try {
+            $conn = $this->connect();
+    
+            $bookSql = "SELECT id FROM books WHERE serial_no = ?";
+            $bookStmt = $conn->prepare($bookSql);
+            $bookStmt->bind_param("s", $bookSerialNo);
+            $bookStmt->execute();
+            $bookResult = $bookStmt->get_result();
+            $bookRow = $bookResult->fetch_assoc();
+    
+            if (!$bookRow) {
+                return ['status' => 400, 'message' => 'Invalid Book Serial Number'];
+            }
+    
+            $sql = "SELECT * FROM booktransactions WHERE book_id = ? AND due_date < CURDATE() AND transaction_type = 'issued'";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("i", $bookRow['id']);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $transactionRow = $result->fetch_assoc();
+    
+            if ($transactionRow) {
+                return ['status' => 400, 'message' => 'Book is overdue', 'book_id' => $bookRow['id']];
+            }
+    
+            return ['status' => 200, 'message' => 'Book is not overdue'];
+    
+        } catch (mysqli_sql_exception $e) {
+            return ["status" => 500, "message" => "Database Error: " . $e->getMessage()];
+        }
+    }
+    
+    
 
     private function validateBook($id) {
         try {
