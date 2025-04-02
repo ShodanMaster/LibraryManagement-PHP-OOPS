@@ -52,6 +52,13 @@ $(document).ready(function () {
                                 text: "This book has already been added."
                             });
                         }
+                    } else if (data.status === 401) {
+                        // Handle the case when the book is already issued
+                        Swal.fire({
+                            icon: "warning",
+                            title: "UnAuthorized",
+                            text: data.message // The message will be something like "The Vishnu book is already issued."
+                        });
                     } else if (data.status === 400) {
                         // Handle the case when the book is already issued
                         Swal.fire({
@@ -75,8 +82,14 @@ $(document).ready(function () {
                             title: "Book Already Issued",
                             text: response.message // Log raw response here for debugging
                         });
+                    } else if (data.status === 401) {
+                        // Handle the case when the book is already issued
+                        Swal.fire({
+                            icon: "warning",
+                            title: "UnAuthorized",
+                            text: data.message // The message will be something like "The Vishnu book is already issued."
+                        });
                     }
-
                     Swal.fire({
                         icon: "error",
                         title: "JSON Parse Error",

@@ -27,7 +27,7 @@ class BookTransaction extends Dbconfig {
             $conn->begin_transaction();
 
             // Fetch member
-            $memberSql = "SELECT id, name FROM members WHERE serial_no = ?";
+            $memberSql = "SELECT id, status, membership_updated, membership_type, name FROM members WHERE serial_no = ?";
             $memberStmt = $conn->prepare($memberSql);
             $memberStmt->bind_param("s", $member);
             $memberStmt->execute();
@@ -36,6 +36,12 @@ class BookTransaction extends Dbconfig {
 
             if (!$memberData) {
                 return ["status" => 404, "message" => "Member not found."];
+            }
+
+            $validateMember = $this->validateMember($memberData);
+
+            if ($validateMember['status'] !== 200) {
+                return $validateMember;
             }
 
             // Fetch book
@@ -191,6 +197,34 @@ class BookTransaction extends Dbconfig {
             }
         
     }
+
+    private function validateMember($memberData) {
+        $memberId = $memberData["id"];
+        $membershipType = $memberData["membership_type"];
+        $membershipUpdated = $memberData["membership_updated"];
+        $membershipStatus = $memberData["status"];
+    
+        if ($membershipStatus === 'expired') {
+            return ['status' => 401, 'message' => 'Membership Expired'];
+        }
+    
+        $currentDate = date('Y-m-d');
+        $daysDifference = (strtotime($currentDate) - strtotime($membershipUpdated)) / (60 * 60 * 24);
+    
+        if (($membershipType === 'monthly' && $daysDifference > 30) ||
+            ($membershipType === 'yearly' && $daysDifference > 365)) {
+            
+            $conn = $this->connect();
+            $sql = 'UPDATE members SET status = "expired" WHERE id = ?';
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("i", $memberId);
+            $stmt->execute();
+    
+            return ['status' => 401, 'message' => 'Membership Expired'];
+        }
+    
+        return ['status' => 200, 'message' => 'Membership Valid'];
+    } 
 
     private function validateBook($id) {
         try {

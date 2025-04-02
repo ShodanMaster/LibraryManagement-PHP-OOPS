@@ -55,7 +55,7 @@
               </div>
             </div>
             <div class="col-md-6">
-              <div class="form-group">
+              <div class="form-group mb-2">
                 <input type="text" class="form-control" name="phone" id="edit-phone" placeholder="Phone" required>
               </div>
             </div>
@@ -66,6 +66,10 @@
                 <option value="yearly">Yearly</option>
               </select>
             </div>
+          </div>
+          <div class="form-check d-flex justify-content-end mt-2">
+            <input class="form-check-input me-2" type="checkbox" name="updateMembership" id="updateMembership">
+            <label class="form-check-label" for="updateMembership">Update Membership</label>
           </div>
         </div>
         <div class="modal-footer">

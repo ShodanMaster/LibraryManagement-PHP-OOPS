@@ -89,7 +89,8 @@ $(document).ready(function () {
         var name = $(this).data('name');
         var phone = $(this).data('phone');
         var type = $(this).data('type');
-    
+        $('#updateMembership').prop('checked', false);
+
         $('#edit-id').val(memberId);
         $('#edit-name').val(name);
         $('#edit-phone').val(phone);

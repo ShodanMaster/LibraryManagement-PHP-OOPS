@@ -111,7 +111,7 @@ class Member extends Dbconfig{
         
     }
 
-    protected function memberUpdate($id, $name, $phone, $type) {
+    protected function memberUpdate($id, $name, $phone, $type, $updateMembership = null) {
         try {
             $conn = $this->connect();
             $conn->begin_transaction();
@@ -125,18 +125,23 @@ class Member extends Dbconfig{
             if ($result->num_rows === 0) {
                 return ["status" => 404, "message" => "Member Not Found"];
             }
-            
+    
             $sql = "UPDATE members SET name = ?, phone = ?, membership_type = ? WHERE id = ?";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("sssi", $name, $phone, $type, $id);
     
-            if ($stmt->execute()) {
-                $conn->commit();
-                return [
-                    'status' => 200,
-                    'message' =>'Member Updated Successfully'
-                ];
+            if (!$stmt->execute()) {
+                throw new mysqli_sql_exception("Failed to update member.");
             }
+    
+            if (isset($updateMembership)) {
+                if (!$this->updateMembership($id, $conn)) {
+                    throw new mysqli_sql_exception("Failed to update membership.");
+                }
+            }
+    
+            $conn->commit();
+            return ['status' => 200, 'message' => 'Member Updated Successfully'];
     
         } catch (mysqli_sql_exception $e) {
             $conn->rollback();
@@ -146,6 +151,18 @@ class Member extends Dbconfig{
             return ["status" => 500, "message" => "Database error: " . $e->getMessage()];
         }
     }
+    
+    private function updateMembership($id, $conn) {
+        $date = date("Y-m-d");
+        $status = "not expired";
+    
+        $sql = "UPDATE members SET membership_updated = ?, status = ? WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ssi", $date, $status, $id);
+        
+        return $stmt->execute();
+    }
+    
     
     public function librarianDelete($id){
         try{

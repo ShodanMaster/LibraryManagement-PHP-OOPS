@@ -52,6 +52,7 @@ class MemberController extends Member{
         $name = $post['name'];
         $phone = $post['phone'];
         $type = $post['type'];
+        $updateMembership = $post['updateMembership'] ?? null;
 
         $validation = $this->validate($name, $phone, $type);
         
@@ -59,7 +60,7 @@ class MemberController extends Member{
             return json_encode($validation);
         }
             
-        $updateMember = $this->memberUpdate($id, $name, $phone,  $type);
+        $updateMember = $this->memberUpdate($id, $name, $phone,  $type, $updateMembership);
         return json_encode($updateMember);
     }
 
