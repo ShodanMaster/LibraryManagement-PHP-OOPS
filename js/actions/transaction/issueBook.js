@@ -107,11 +107,11 @@ $(document).ready(function () {
         $(`#row-${bookId}`).remove();
     });
 
-    $(document).on('submit', '#bookTransaction', function(e) {
+    $(document).on('submit', '#issueBook', function(e) {
         e.preventDefault();
     
         var formData = new FormData(this);
-        formData.append('action', 'bookTransaction');
+        formData.append('action', 'issueBook');
     
         $.ajax({
             type: "POST",
@@ -133,7 +133,8 @@ $(document).ready(function () {
                         });
     
                         // Reset Form Fields
-                        $('#bookTransaction')[0].reset();
+                        $('#add-form')[0].reset();
+                        $('#issueBook')[0].reset();
     
                         // Clear Book Table and ID Storage
                         $('#bookTable tbody').empty();

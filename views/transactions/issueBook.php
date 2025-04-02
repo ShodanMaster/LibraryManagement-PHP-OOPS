@@ -26,7 +26,7 @@
 </div>
 
 
-<form id="bookTransaction">
+<form id="issueBook">
     <input type="hidden" name="memberId" id="memberId">
     <input type="hidden" name="bookIds" id="bookIds">
 
@@ -56,4 +56,4 @@
 </div>
 </form>
 
-<script src="js/actions/transaction/booktransaction.js"></script>
+<script src="js/actions/transaction/issueBook.js"></script>

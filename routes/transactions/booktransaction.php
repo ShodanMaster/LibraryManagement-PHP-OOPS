@@ -7,9 +7,9 @@ $action = $_REQUEST['action'] ?? '';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
-    if ($action == 'bookTransaction') {
+    if ($action == 'issueBook') {
         
-       $response =  $bookTransaction->saveTransaction($_POST);
+       $response =  $bookTransaction->issueBook($_POST);
        echo $response;
     }
     
@@ -23,5 +23,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
         echo $dataResponse;
     
+    }
+
+    if ($action == 'returnBook') {
+        
+        $response = $bookTransaction->fetchBooks($_POST);
+
+        echo $response;
+    }
+
+    if($action == 'returnScan'){
+
+        $response = $bookTransaction->returnScan($_POST);
+
+        echo $response;
     }
 }

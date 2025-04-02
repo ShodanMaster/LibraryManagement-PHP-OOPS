@@ -16,7 +16,7 @@ class BookTransaction extends Dbconfig {
     protected function bookTransaction($member, $book) {
         $data = $this->dataFetch($member, $book);
         if ($data['status'] === 200) {
-            return $this->transactionSave($data['member']['id'], [$data['book']['id']]);
+            return $this->bookIssue($data['member']['id'], [$data['book']['id']]);
         }
         return $data;
     }
@@ -69,7 +69,7 @@ class BookTransaction extends Dbconfig {
         }
     }
 
-    protected function transactionSave($memberId, $booksIds) {
+    protected function bookIssue($memberId, $booksIds) {
         try {
             $conn = $this->connect();
             $conn->begin_transaction();
@@ -109,6 +109,89 @@ class BookTransaction extends Dbconfig {
         }
     }
 
+    protected function booksFetch($memberSerailNo){
+        try{
+            $conn = $this->connect();
+            $conn->begin_transaction();
+
+            $sql = "SELECT id FROM members WHERE serial_no = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("s", $memberSerailNo);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $row = $result->fetch_assoc();
+
+            if ($result->num_rows > 0) {
+                $bookSql = "SELECT 
+                                books.id AS bookID, 
+                                books.title AS bookTitle, 
+                                books.serial_no AS bookSNO 
+                            FROM booktransactions 
+                            JOIN books ON booktransactions.book_id = books.id 
+                            WHERE booktransactions.member_id = ? 
+                            AND booktransactions.status = 'issued'";
+                $stmt = $conn->prepare($bookSql);
+                $stmt->bind_param("i", $row['id']);
+                $stmt->execute();
+                $result = $stmt->get_result();
+
+                $books = [];
+                while ($row = $result->fetch_assoc()) {
+                    $books[] = $row;
+                }
+
+                if (!empty($books)) {
+                    return ['status' => 200, 'message' => 'Books Found', 'data' => $books];
+                }
+            }
+                        
+            return ['status' => 404, 'message' => 'No books found'];
+                
+        } catch (mysqli_sql_exception $e) {
+            return ["status" => 500, "message" => "Database Error: " . $e->getMessage()];
+        }
+    }
+
+    protected function scanReturn($memberSerialNo, $bookSerialNo){
+        
+        try{
+
+            $validateMemberBook = $this->validateMemberBook( $memberSerialNo, $bookSerialNo);
+
+            if($validateMemberBook['status'] !== 200){
+                return $validateMemberBook;
+            }
+
+            $conn = $this->connect();
+            $conn->begin_transaction();
+
+            $returnDate = date("Y-m-d");
+            $status = 'returned';
+
+            $updateSql = "UPDATE booktransactions SET return_date = ?, status = ? WHERE member_id = 
+                        (SELECT id FROM members WHERE serial_no = ?) 
+                        AND book_id = (SELECT id FROM books WHERE serial_no = ?) 
+                        AND transaction_type = 'issued' LIMIT 1";
+            $stmt = $conn->prepare($updateSql);
+            $stmt->bind_param("ssss", $returnDate, $status, $memberSerialNo, $bookSerialNo);
+
+            $stmt->execute();
+
+            if ($stmt->affected_rows > 0) {
+                $conn->commit();
+                return ["status" => 200, "message" => "Book returned successfully."];
+            } else {
+                $conn->rollback();
+                return ["status" => 400, "message" => "Failed to return book."];
+            }
+
+
+            } catch (mysqli_sql_exception $e) {
+                return ["status" => 500, "message" => "Database Error: " . $e->getMessage()];
+            }
+        
+    }
+
     private function validateBook($id) {
         try {
             $conn = $this->connect(); 
@@ -141,5 +224,44 @@ class BookTransaction extends Dbconfig {
             return ["status" => 500, "message" => "Database Error: " . $e->getMessage()];
         }
     }
+
+    private function validateMemberBook($memberSerialNo, $bookSerialNo) {
+        try {
+            $conn = $this->connect();
+
+            $memberSql = "SELECT id FROM members WHERE serial_no = ?";
+            $memberStmt = $conn->prepare($memberSql);
+            $memberStmt->bind_param("s", $memberSerialNo);
+            $memberStmt->execute();
+            $memberResult = $memberStmt->get_result();
+            $memberRow = $memberResult->fetch_assoc();
+
+            $bookSql = "SELECT id FROM books WHERE serial_no = ?";
+            $bookStmt = $conn->prepare($bookSql);
+            $bookStmt->bind_param("s", $bookSerialNo);
+            $bookStmt->execute();
+            $bookResult = $bookStmt->get_result();
+            $bookRow = $bookResult->fetch_assoc();
+
+            if ($bookResult->num_rows > 0 && $memberResult->num_rows > 0) {
+                $sql = "SELECT * FROM booktransactions WHERE member_id = ? AND book_id = ? AND transaction_type = 'issued'";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("ii", $memberRow['id'], $bookRow['id']);
+                $stmt->execute();
+                $result = $stmt->get_result();
+
+                if ($result->num_rows > 0) {
+                    return ['status' => 200, 'message' => 'Member Took this Book', 'book_id' => $bookRow['id'], 'member_id' => $memberRow['id']];
+                }
+                return ['status' => 400, 'message' => 'Member Did Not Take this Book'];
+            }
+
+            return ['status' => 400, 'message' => 'Invalid Member or Book Serial Number'];
+
+        } catch (mysqli_sql_exception $e) {
+            return ["status" => 500, "message" => "Database Error: " . $e->getMessage()];
+        }
+    }
+
 }
 ?>

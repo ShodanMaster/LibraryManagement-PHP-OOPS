@@ -19,7 +19,7 @@ class BookTransactionController extends BookTransaction{
         return json_encode($dataJson);
     }
 
-    public function saveTransaction($post){
+    public function issueBook($post){
         
         $memberId = $post["memberId"];
         $booksIds = $post["bookIds"];
@@ -27,8 +27,26 @@ class BookTransactionController extends BookTransaction{
         $bookIdsArray = json_decode($booksIds, true);
         
         
-        $transactionSave = $this->transactionSave($memberId,$bookIdsArray);
+        $transactionSave = $this->bookIssue($memberId,$bookIdsArray);
 
         return json_encode($transactionSave);
+    }
+
+    public function fetchBooks($post){
+        // print_r($post);
+        $memberSerailNo = $post["memberSerialNo"];
+        // echo $memberSerailNo;exit;
+        $booksFetch = $this->booksFetch($memberSerailNo);
+
+        return json_encode($booksFetch);
+    }
+
+    public function returnScan($post){
+        $memberSerialNo = $post["memberSerialNo"];
+        $bookSerialNo = $post["bookSerialNo"];
+
+        $scanRetrun = $this->scanReturn($memberSerialNo, $bookSerialNo);
+
+        return json_encode($scanRetrun);
     }
 }
