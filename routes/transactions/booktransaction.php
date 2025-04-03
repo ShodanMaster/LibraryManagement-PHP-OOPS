@@ -38,4 +38,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         echo $response;
     }
+
+    if($action == 'renewScan'){
+
+        $response = $bookTransaction->renewScan($_POST);
+
+        echo $response;
+    }
 }

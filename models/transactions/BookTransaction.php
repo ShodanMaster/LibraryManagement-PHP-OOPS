@@ -189,7 +189,7 @@ class BookTransaction extends Dbconfig {
             $updateSql = "UPDATE booktransactions SET return_date = ?, status = ? WHERE member_id = 
                         (SELECT id FROM members WHERE serial_no = ?) 
                         AND book_id = (SELECT id FROM books WHERE serial_no = ?) 
-                        AND transaction_type = 'issued' LIMIT 1";
+                        AND transaction_type = 'returned' LIMIT 1";
             $stmt = $conn->prepare($updateSql);
             $stmt->bind_param("ssss", $returnDate, $status, $memberSerialNo, $bookSerialNo);
 
@@ -210,6 +210,66 @@ class BookTransaction extends Dbconfig {
         
     }
 
+    protected function scanRenew($memberSerialNo, $bookSerialNo){
+        try{
+            $validateMemberBook = $this->validateMemberBook($memberSerialNo, $bookSerialNo);
+    
+            if ($validateMemberBook['status'] !== 200) {
+                return $validateMemberBook;
+            }
+    
+            $validateDueDate = $this->validateDueDate($bookSerialNo);
+    
+            if ($validateDueDate['status'] !== 200) {
+                return $validateDueDate;
+            }
+    
+            $conn = $this->connect();
+            $conn->begin_transaction();
+    
+            // Retrieve the current due date
+            $selectSql = "SELECT due_date FROM booktransactions 
+                          WHERE member_id = (SELECT id FROM members WHERE serial_no = ?) 
+                          AND book_id = (SELECT id FROM books WHERE serial_no = ?) 
+                          AND transaction_type = 'issued' LIMIT 1";
+            $stmt = $conn->prepare($selectSql);
+            $stmt->bind_param("ss", $memberSerialNo, $bookSerialNo);
+            $stmt->execute();
+            $stmt->store_result();
+            
+            if ($stmt->num_rows === 0) {
+                return ["status" => 400, "message" => "No active transaction found for renewal."];
+            }
+    
+            $stmt->bind_result($currentDueDate);
+            $stmt->fetch();
+            $stmt->close();
+    
+            // Calculate the new due date (current due date + 1 month)
+            $newDueDate = date("Y-m-d", strtotime($currentDueDate . " +1 month"));
+    
+            // Update the due date
+            $updateSql = "UPDATE booktransactions SET due_date = ? 
+                          WHERE member_id = (SELECT id FROM members WHERE serial_no = ?) 
+                          AND book_id = (SELECT id FROM books WHERE serial_no = ?) 
+                          AND transaction_type = 'issued' LIMIT 1";
+            $stmt = $conn->prepare($updateSql);
+            $stmt->bind_param("sss", $newDueDate, $memberSerialNo, $bookSerialNo);
+            $stmt->execute();
+    
+            if ($stmt->affected_rows > 0) {
+                $conn->commit();
+                return ["status" => 200, "message" => "Book renewal successful. New due date: $newDueDate"];
+            } else {
+                $conn->rollback();
+                return ["status" => 400, "message" => "Failed to renew book."];
+            }
+    
+        } catch (mysqli_sql_exception $e) {
+            return ["status" => 500, "message" => "Database Error: " . $e->getMessage()];
+        }
+    }
+    
     private function validateMember($memberData) {
         $memberId = $memberData["id"];
         $membershipType = $memberData["membership_type"];
