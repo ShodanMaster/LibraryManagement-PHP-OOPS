@@ -45,4 +45,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         echo $response;
     }
+
+    if($action == 'fineBooks'){
+        
+        $response = $bookTransaction->fineBooks($_POST);
+
+        echo $response;
+    }
+
+    if($action == 'fineScan'){
+        
+        $response = $bookTransaction->fineScan($_POST);
+
+        echo $response;
+    }
 }

@@ -3,7 +3,7 @@ $(document).ready(function () {
         e.preventDefault();
 
         var formData = new FormData(this);
-        formData.append('action', 'returnBook');
+        formData.append('action', 'fineBooks');
 
         $.ajax({
             type: "POST",
@@ -12,7 +12,7 @@ $(document).ready(function () {
             contentType: false,
             processData: false,
             success: function (response) {                
-                $('#renewBooksCard').show();
+                $('#fineBooksCard').show();
                 $('#bookTable').show();
                 try {
                     let data = JSON.parse(response);
@@ -32,7 +32,7 @@ $(document).ready(function () {
                             tableBody.insertAdjacentHTML('beforeend', newRow);
                         });
                     } else {
-                        $('#renewBooksCard').hide();
+                        $('#fineBooksCard').hide();
                         $('#bookTable').hide();
                         Swal.fire({
                             icon: "error",
@@ -58,7 +58,7 @@ $(document).ready(function () {
         });
     });
 
-    $(document).on('submit', '#renewBooksForm', function (e) {
+    $(document).on('submit', '#fineScanForm', function (e) {
         e.preventDefault();
 
         var memberSerialNo = document.getElementById('memberSerialNo').value;
@@ -66,7 +66,7 @@ $(document).ready(function () {
         var formData = new FormData();
         formData.append('memberSerialNo', memberSerialNo);
         formData.append('bookSerialNo', bookSerialNo);
-        formData.append('action', 'renewScan');
+        formData.append('action', 'fineScan');
 
         $.ajax({
             type: "POST",

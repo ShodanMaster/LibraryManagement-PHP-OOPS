@@ -59,4 +59,22 @@ class BookTransactionController extends BookTransaction{
         return json_encode($scanRetrun);
     }
 
+    public function fineBooks($post){
+        $memberSerialNo = $post["memberSerialNo"];
+        
+        $scanFineBooks = $this->booksFine($memberSerialNo);
+
+        return json_encode($scanFineBooks);
+    }
+
+    
+    public function fineScan($post){
+        $memberSerialNo = $post["memberSerialNo"];
+        $bookSerialNo = $post["bookSerialNo"];
+
+        $scanRetrun = $this->scanFine($memberSerialNo, $bookSerialNo);
+
+        return json_encode($scanRetrun);
+    }
+
 }

@@ -51,6 +51,7 @@ $act = isset($_GET["act"]) ? $_GET["act"] : "";
                             <li><a class="dropdown-item" href="index.php?act=issuebook">Issue Book</a></li>
                             <li><a class="dropdown-item" href="index.php?act=returnbook">Return Book</a></li>
                             <li><a class="dropdown-item" href="index.php?act=renewbook">Renew Book</a></li>
+                            <li><a class="dropdown-item" href="index.php?act=finebook">Fine Book</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -95,6 +96,9 @@ $act = isset($_GET["act"]) ? $_GET["act"] : "";
                 break;
             case "renewbook":
                 include "views/transactions/renewBook.php";
+                break;
+            case "finebook":
+                include "views/transactions/fineBook.php";
                 break;
         }
 

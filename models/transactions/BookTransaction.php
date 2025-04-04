@@ -140,17 +140,17 @@ class BookTransaction extends Dbconfig {
                             FROM booktransactions 
                             JOIN books ON booktransactions.book_id = books.id 
                             WHERE booktransactions.member_id = ? 
-                            AND booktransactions.status = 'issued'";
+                            AND booktransactions.transaction_type = 'issued'";
 
-            $stmt = $conn->prepare($bookSql);
-            $stmt->bind_param("i", $row['id']);
-            $stmt->execute();
-            $result = $stmt->get_result();
+                $stmt = $conn->prepare($bookSql);
+                $stmt->bind_param("i", $row['id']);
+                $stmt->execute();
+                $result = $stmt->get_result();
 
-            $books = [];
-            while ($row = $result->fetch_assoc()) {
-                $books[] = $row;
-            }
+                $books = [];
+                while ($row = $result->fetch_assoc()) {
+                    $books[] = $row;
+                }
 
                 if (!empty($books)) {
                     return ['status' => 200, 'message' => 'Books Found', 'data' => $books];
@@ -164,8 +164,58 @@ class BookTransaction extends Dbconfig {
         }
     }
 
-    protected function scanReturn($memberSerialNo, $bookSerialNo){
-        
+    protected function booksFine($memberSerialNo) {
+        try {
+            $conn = $this->connect();
+    
+            $sql = "SELECT id FROM members WHERE serial_no = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("s", $memberSerialNo);
+            $stmt->execute();
+            $result = $stmt->get_result();
+    
+            if ($result->num_rows === 0) {
+                return ['status' => 404, 'message' => 'Member not found'];
+            }
+    
+            $member = $result->fetch_assoc();
+    
+            $bookSql = "SELECT 
+                            books.id AS bookID, 
+                            books.title AS bookTitle, 
+                            books.serial_no AS bookSNO,
+                            booktransactions.due_date,
+                            CASE 
+                                WHEN booktransactions.due_date < CURDATE() THEN 'Yes' 
+                                ELSE 'No' 
+                            END AS isDue
+                        FROM booktransactions 
+                        JOIN books ON booktransactions.book_id = books.id 
+                        WHERE booktransactions.member_id = ? 
+                        AND booktransactions.status = 'overdue'";
+    
+            $stmt = $conn->prepare($bookSql);
+            $stmt->bind_param("i", $member['id']);
+            $stmt->execute();
+            $result = $stmt->get_result();
+    
+            $books = [];
+            while ($bookRow = $result->fetch_assoc()) {
+                $books[] = $bookRow;
+            }
+    
+            if (!empty($books)) {
+                return ['status' => 200, 'message' => 'Books Found', 'data' => $books];
+            }
+    
+            return ['status' => 404, 'message' => 'No fined books found'];
+    
+        } catch (mysqli_sql_exception $e) {
+            return ["status" => 500, "message" => "Database Error: " . $e->getMessage()];
+        }
+    }
+
+    protected function scanFine($memberSerialNo, $bookSerialNo){
         try{
 
             $validateMemberBook = $this->validateMemberBook( $memberSerialNo, $bookSerialNo);
@@ -177,24 +227,70 @@ class BookTransaction extends Dbconfig {
             $validateDueDate = $this->validateDueDate($bookSerialNo);
 
             if($validateDueDate['status'] !== 200){
-                return $validateDueDate;
+                
+                $conn = $this->connect();
+                $conn->begin_transaction();
+                
+                $status = 'issue';
+                $date = date('Y-m-d');
+    
+                $updateSql = "UPDATE booktransactions SET status = ?, due_date = ? WHERE member_id = 
+                            (SELECT id FROM members WHERE serial_no = ?) 
+                            AND book_id = (SELECT id FROM books WHERE serial_no = ?) 
+                            AND transaction_type = 'issued' LIMIT 1";
+                $stmt = $conn->prepare($updateSql);
+                $stmt->bind_param("ssss", $status, $date,$memberSerialNo, $bookSerialNo);
+    
+                $stmt->execute();
+    
+                if ($stmt->affected_rows > 0) {
+                    $conn->commit();
+                    return ["status" => 200, "message" => "Book Fined successfully."];
+                } else {
+                    $conn->rollback();
+                    return ["status" => 400, "message" => "Failed to fined book."];
+                }
             }
 
+            return $validateDueDate;
+
+        } catch (mysqli_sql_exception $e) {
+            return ["status" => 500, "message" => "Database Error: " . $e->getMessage()];
+        }
+    }
+    
+
+    protected function scanReturn($memberSerialNo, $bookSerialNo) {
+        try {
+            // Validate if the member has issued this book
+            $validateMemberBook = $this->validateMemberBook($memberSerialNo, $bookSerialNo);
+            if ($validateMemberBook['status'] !== 200) {
+                return $validateMemberBook;
+            }
+    
+            // Validate if book is not overdue (optional: remove this if you still want to allow return even if overdue)
+            $validateDueDate = $this->validateDueDate($bookSerialNo);
+            if ($validateDueDate['status'] !== 200) {
+                return $validateDueDate;
+            }
+    
             $conn = $this->connect();
             $conn->begin_transaction();
-
+    
             $returnDate = date("Y-m-d");
             $status = 'returned';
-
-            $updateSql = "UPDATE booktransactions SET return_date = ?, status = ? WHERE member_id = 
-                        (SELECT id FROM members WHERE serial_no = ?) 
-                        AND book_id = (SELECT id FROM books WHERE serial_no = ?) 
-                        AND transaction_type = 'returned' LIMIT 1";
+    
+            $updateSql = "UPDATE booktransactions 
+                          SET return_date = ?, status = ? 
+                          WHERE member_id = (SELECT id FROM members WHERE serial_no = ?) 
+                          AND book_id = (SELECT id FROM books WHERE serial_no = ?) 
+                          AND transaction_type = 'issued' 
+                          LIMIT 1";
+    
             $stmt = $conn->prepare($updateSql);
             $stmt->bind_param("ssss", $returnDate, $status, $memberSerialNo, $bookSerialNo);
-
             $stmt->execute();
-
+    
             if ($stmt->affected_rows > 0) {
                 $conn->commit();
                 return ["status" => 200, "message" => "Book returned successfully."];
@@ -202,13 +298,12 @@ class BookTransaction extends Dbconfig {
                 $conn->rollback();
                 return ["status" => 400, "message" => "Failed to return book."];
             }
-
-
-            } catch (mysqli_sql_exception $e) {
-                return ["status" => 500, "message" => "Database Error: " . $e->getMessage()];
-            }
-        
+    
+        } catch (mysqli_sql_exception $e) {
+            return ["status" => 500, "message" => "Database Error: " . $e->getMessage()];
+        }
     }
+    
 
     protected function scanRenew($memberSerialNo, $bookSerialNo){
         try{
@@ -301,7 +396,7 @@ class BookTransaction extends Dbconfig {
     private function validateDueDate($bookSerialNo) {
         try {
             $conn = $this->connect();
-    
+            
             $bookSql = "SELECT id FROM books WHERE serial_no = ?";
             $bookStmt = $conn->prepare($bookSql);
             $bookStmt->bind_param("s", $bookSerialNo);
@@ -312,16 +407,30 @@ class BookTransaction extends Dbconfig {
             if (!$bookRow) {
                 return ['status' => 400, 'message' => 'Invalid Book Serial Number'];
             }
-    
-            $sql = "SELECT * FROM booktransactions WHERE book_id = ? AND due_date < CURDATE() AND transaction_type = 'issued'";
+            
+            $sql = "SELECT id, status, due_date FROM booktransactions 
+                    WHERE book_id = ? AND transaction_type = 'issued' LIMIT 1";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("i", $bookRow['id']);
             $stmt->execute();
             $result = $stmt->get_result();
             $transactionRow = $result->fetch_assoc();
     
-            if ($transactionRow) {
-                return ['status' => 400, 'message' => 'Book is overdue', 'book_id' => $bookRow['id']];
+            if (!$transactionRow) {
+                return ['status' => 400, 'message' => 'No active transaction found for this book'];
+            }
+            
+            if ($transactionRow['status'] === 'overdue') {
+                return ['status' => 400, 'message' => 'Book is overdue'];
+            }
+            
+            if ($transactionRow['due_date'] < date("Y-m-d")) {
+                $updateSql = "UPDATE booktransactions SET status = 'overdue' WHERE id = ?";
+                $updateStmt = $conn->prepare($updateSql);
+                $updateStmt->bind_param("i", $transactionRow['id']);
+                $updateStmt->execute();
+    
+                return ['status' => 400, 'message' => 'Book overdue'];
             }
     
             return ['status' => 200, 'message' => 'Book is not overdue'];
@@ -330,6 +439,7 @@ class BookTransaction extends Dbconfig {
             return ["status" => 500, "message" => "Database Error: " . $e->getMessage()];
         }
     }
+    
     
     
 
